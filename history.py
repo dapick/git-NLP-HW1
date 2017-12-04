@@ -1,3 +1,6 @@
+from parsing import Parsing
+
+
 class History(object):
     current_word = None
     tags = None
@@ -20,3 +23,23 @@ class History(object):
 
     def ends_with(self, suffix: str) -> bool:
         return self.current_word.endswith(suffix)
+
+
+class Histories(object):
+    # Returns a list of all possible histories
+    @staticmethod
+    def build_history_list(file_full_name: str) -> list:
+        sentences, tags = Parsing.parse_wtag_file_to_lists(file_full_name)
+        histories = []
+        for sentence, sentence_tags in zip(sentences, tags):
+            for idx, word in enumerate(sentence):
+                if idx > 1:
+                    previous_tags = (sentence_tags[idx-2], sentence_tags[idx-1])
+                    histories.append(History(word, previous_tags))
+                else:
+                    if idx == 0:
+                        histories.append(History(word))
+                    else:
+                        previous_tags = ("*", sentence_tags[idx-1])
+                        histories.append(History(word, previous_tags))
+        return histories
