@@ -22,13 +22,13 @@ class HistoryTestCase(unittest.TestCase):
     def test_build_history_list_from_one_sentence(self):
         history_one_sentences_file_name = "trialDataFiles/trialOneSentence.wtag"
         # TODO: quite hard to check it. Looks good for now - 04/12
-        histories = Histories.build_history_list(history_one_sentences_file_name)
+        histories, _ = Histories.build_history_list_and_tags_list(history_one_sentences_file_name)
         print("Finished")
 
     def test_build_history_list_from_two_sentence(self):
         history_one_sentences_file_name = "trialDataFiles/trialTwoSentences.wtag"
         # TODO: quite hard to check it. Looks good for now - 04/12
-        histories = Histories.build_history_list(history_one_sentences_file_name)
+        histories, _ = Histories.build_history_list_and_tags_list(history_one_sentences_file_name)
         print("Finished")
 
 

@@ -26,9 +26,9 @@ class History(object):
 
 
 class Histories(object):
-    # Returns a list of all possible histories
+    # Returns a list of all possible histories and the tags given
     @staticmethod
-    def build_history_list(file_full_name: str) -> list:
+    def build_history_list_and_tags_list(file_full_name: str) -> (list, list):
         sentences, tags = Parsing.parse_wtag_file_to_lists(file_full_name)
         histories = []
         for sentence, sentence_tags in zip(sentences, tags):
@@ -42,4 +42,4 @@ class Histories(object):
                     else:
                         previous_tags = ("*", sentence_tags[idx-1])
                         histories.append(History(word, previous_tags))
-        return histories
+        return histories, tags
