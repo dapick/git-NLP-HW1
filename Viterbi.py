@@ -1,4 +1,3 @@
-import numpy as np
 from basicModel import BasicModel
 from history import History
 import tags
@@ -53,10 +52,3 @@ class Viterbi:
         return res
 
 
-def main():
-    pi = {('*', 'D', '*'): 1}
-    print(pi)
-
-
-if '__main__' == __name__:
-    main()
