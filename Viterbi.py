@@ -1,7 +1,8 @@
 import numpy as np
 from basicModel import BasicModel
 from history import History
-import tags
+import consts
+from math import exp
 
 
 class Viterbi:
@@ -11,11 +12,11 @@ class Viterbi:
     def __init__(self, words: list):
         self.basicModel = BasicModel()
         self.words = words
-        self.tags = tags.Tags().POS_TAGS
+        self.tags = consts.Consts().POS_TAGS
 
     def q(self, idx: int, tag: str, tag1: str, tag2: str):
-        history = History(self.words[idx], (tag1, tag2))
-        self.basicModel.probability(history, tag)
+        history = History([tag1, tag2], self.words, idx)
+        return exp(self.basicModel.log_probability(history, tag))
 
     def max_prob(self, pi:  dict, idx:  int, u: str, v: str):
         max_prob = 0
@@ -27,7 +28,6 @@ class Viterbi:
                 max_prob = cur
                 max_bp = [t, u]
         return [max_prob, max_bp]
-
 
     def run_viterbi(self):
         # initialization
