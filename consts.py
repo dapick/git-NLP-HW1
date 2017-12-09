@@ -6,3 +6,7 @@ class Consts:
     PATH_TO_TRAINING = "data/train.wtag"
     PATH_TO_TEST = "data/test.wtag"
     PATH_TO_COMPETITION = "data/comp.words"
+
+    @staticmethod
+    def print_status(function_name: str, message: str):
+        print("-I-(" + function_name + "): " + message)
