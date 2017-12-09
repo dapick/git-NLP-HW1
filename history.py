@@ -1,45 +1,48 @@
 from parsing import Parsing
+from consts import Consts
 
 
 class History(object):
-    current_word = None
     tags = None
+    sentence = None
+    current_word_idx = None
 
-    # Creates a new History instance.
-    # Saves the current word and the last two tags.
-    # If no tags were sent, saves the first two tags as two '*'
-    def __init__(self, current_word: str, tags: tuple=("*", "*")):
-        self.current_word = current_word
+    # Creates a new History instance
+    def __init__(self, tags: list, sentence: list, current_word_idx: int):
         self.tags = tags
+        self.sentence = sentence
+        self.current_word_idx = current_word_idx
 
-    def __hash__(self):
-        return hash((self.current_word, self.tags))
+    def get_current_word(self):
+        return self.sentence[self.current_word_idx]
 
-    def __eq__(self, other):
-        return (self.current_word, self.tags) == (other.current_word, other.tags)
+    # Returns the current word idx first letters
+    def word_custom_prefix(self, idx: int) -> str:
+        return self.sentence[self.current_word_idx][:idx]
 
-    def starts_with(self, prefix: str) -> bool:
-        return self.current_word.startswith(prefix)
-
-    def ends_with(self, suffix: str) -> bool:
-        return self.current_word.endswith(suffix)
+    # Returns the current word idx last letters
+    def word_custom_suffix(self, idx: int) -> str:
+        return self.sentence[self.current_word_idx][-idx:]
 
 
 class Histories(object):
     # Returns a list of all possible histories and the tags given
     @staticmethod
-    def build_history_list_and_tags_list(file_full_name: str) -> (list, list):
+    def build_history_list_and_tags_list(file_full_name: str=Consts.PATH_TO_TRAINING) -> (list, list):
         sentences, tags = Parsing.parse_wtag_file_to_lists(file_full_name)
         histories = []
+        histories_tags = []
         for sentence, sentence_tags in zip(sentences, tags):
-            for idx, word in enumerate(sentence):
+            for idx, tag in enumerate(sentence_tags):
                 if idx > 1:
-                    previous_tags = (sentence_tags[idx-2], sentence_tags[idx-1])
-                    histories.append(History(word, previous_tags))
+                    histories.append(
+                        History([sentence_tags[idx-2], sentence_tags[idx-1]], sentence, idx))
                 else:
                     if idx == 0:
-                        histories.append(History(word))
+                        histories.append(
+                            History(["*", "*"], sentence, idx))
                     else:
-                        previous_tags = ("*", sentence_tags[idx-1])
-                        histories.append(History(word, previous_tags))
-        return histories, tags
+                        histories.append(
+                            History(["*", sentence_tags[idx-1]], sentence, idx))
+                histories_tags.append(tag)
+        return histories, histories_tags

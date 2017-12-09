@@ -1,64 +1,85 @@
 from features import Feature
 from scipy.optimize import minimize
-from history import Histories, History
+from history import History
 import numpy as np
-from math import exp
-from tags import Tags
+from math import exp, log
+from consts import Consts
 
 
 class BasicModel(object):
-    features_vector = None
-    histories = None
-    tags = None
-    v_parameter = 0
+    feature = None
+
+    v_parameter = None
     # TODO: find which lambda should we use
     lambda_value = 2
 
-    def __init__(self):
-        self.features_vector = [Feature.feature_100,
-                                Feature.feature_103,
-                                Feature.feature_104]
-        self.histories, self.tags = \
-            Histories.build_history_list_and_tags_list("data/train.wtag")
+    # Calculates for L
+    # For each pair (h, t) holds the featurs' idx it applies
+    history_tag_features = None
 
-    # TODO: decide if v_parameter is a parameter for this function or not
-    # TODO: convert to the log version
-    def probability(self, history: History, tag: str):
-        f_value_np_array = np.asarray([
-                    self.features_vector[0](history, tag),
-                    self.features_vector[1](history, tag),
-                    self.features_vector[2](history, tag)])
-        numerator = exp(np.sum(self.v_parameter * f_value_np_array))
+    def __init__(self, file_full_name: str=Consts.PATH_TO_TRAINING):
+        self.feature = Feature(file_full_name, ("100", "103", "104"))
+        self.feature.feature_100()
+        self.feature.feature_103()
+        self.feature.feature_104()
 
-        denominator = 0
-        for curr_tag in Tags.POS_TAGS:
-            f_value_np_array = np.asarray([
-                    self.features_vector[0](history, curr_tag),
-                    self.features_vector[1](history, curr_tag),
-                    self.features_vector[2](history, curr_tag)])
-            denominator += exp(np.sum(self.v_parameter * f_value_np_array))
+        self.history_tag_features = {}
+        self._calculate_L_values()
+        optimize_result = minimize(self._L, np.zeros(len(self.feature.features_occurrences)), jac=True, method="L-BFGS-B")
+        self.v_parameter = optimize_result.x
 
-        return numerator/denominator
+    # Calculate v sum in the idx where the feature applies for the pair: (h, t)
+    def _calculate_v_sum(self, v_parameter, history: History, tag: str) -> float:
+        v_sum = 0
+        for idx in self.history_tag_features[(history, tag)]:
+            v_sum += v_parameter[idx]
+        return v_sum
 
-    # TODO: decide if v_parameter is a parameter for this function or not
-    def gradient_k(self, k: int):
-        # Calculate the first argument of the gradient
-        feature_sum = 0
-        for history, tag in zip(self.histories, self.tags):
-            feature_sum += self.features_vector[k](history, tag)
+    # Calculates the sum: sum(exp(v*f(h, t)))
+    def _calculate_inner_sum(self, v_parameter, history: History) -> float:
+        inner_sum = 0
+        for tag in Consts.POS_TAGS:
+            inner_sum += exp(self._calculate_v_sum(v_parameter, history, tag))
+        return inner_sum
 
-        # Calculate the second argument of the gradient
+    def _calculate_L_values(self):
+        for history in self.feature.histories:
+            for tag in Consts.POS_TAGS:
+                self.history_tag_features[(history, tag)] = \
+                    self.feature.history_matched_features(history, tag)
+
+    def v_squares(self, v_parameter):
+        v_squares = 0
+        for idx in range(0, len(v_parameter)):
+            v_squares += v_parameter[idx]**2
+        return v_squares
+
+    def _L(self, v_parameter) -> (float, list):
+        left_sum = sum(np.asarray(v_parameter) *
+                       np.asarray(list(self.feature.features_occurrences.values())))
+
+        right_sum = 0
+        for history in self.feature.histories:
+            right_sum += log(self._calculate_inner_sum(v_parameter, history))
+        gradients_list = []
+        for idx in range(0, len(self.feature.features_occurrences)):
+            gradients_list.append(self._gradient_k(v_parameter, idx))
+
+        return -(left_sum - right_sum - (self.lambda_value/2)*self.v_squares(v_parameter)), gradients_list
+
+    def _gradient_k(self, v_parameter, k: int) -> float:
+        feature_sum = self.feature.features_occurrences[k]
+
         histories_sum = 0
-        for history in self.histories:
-            history_sum = 0
-            for tag in self.tags:
-                history_sum += \
-                    self.features_vector[k](history, tag) * self.probability(history, tag)
-            history_sum += history_sum
+        for history in self.feature.histories:
+            for tag in Consts.POS_TAGS:
+                if k in self.history_tag_features[(history, tag)]:
+                    histories_sum += self._calculate_v_sum(v_parameter, history, tag) / \
+                                     self._calculate_inner_sum(v_parameter, history)
 
-        return feature_sum - histories_sum
+        return -(feature_sum - histories_sum - self.lambda_value*v_parameter[k])
 
-
-
-
-
+    # Calculates log(p(y|x;v))
+    def log_probability(self, history: History, tag: str) -> float:
+        return self._calculate_v_sum(self.v_parameter, history, tag) - \
+               log(self._calculate_inner_sum(self.v_parameter, history))
