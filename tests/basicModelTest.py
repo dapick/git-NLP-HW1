@@ -3,6 +3,7 @@ import unittest
 from consts import Consts
 from basicModel import BasicModel
 
+
 class MyTestCase(unittest.TestCase):
     def test_v_parameter_calculation(self):
         basic_model = BasicModel("../" + Consts.PATH_TO_TRAINING)
