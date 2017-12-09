@@ -6,13 +6,12 @@ class Feature(object):
     histories = None
     tags = None
     idx = None
+    features_funcs = None
     used_features = None
 
     # key = (feature_number, (feature_definition))
     # value = [feature_idx, number_of_times_occurs]
     feature_vector = None
-    # The features idx which appear in the file
-    features_idxs = None
     # The number of occurrences for each feature
     # Dict of {(feature_idx): occurrence_number}
     features_occurrences = None
@@ -26,11 +25,17 @@ class Feature(object):
             Histories.build_history_list_and_tags_list(file_full_name)
         self.used_features = used_features
 
+        self.features_funcs = {"100": self.feature_100, "101": self.feature_101, "102": self.feature_102,
+                               "103": self.feature_103, "104": self.feature_104, "105": self.feature_105}
+
         self.idx = 0
         self.feature_vector = {}
-        # TODO: can probably delete this field
-        self.features_idxs = []
         self.features_occurrences = {}
+
+        for feature_type in used_features:
+            self.features_funcs[feature_type]()
+
+        self._reduce_features()
 
         self.history_features_idxs = []
 
@@ -38,8 +43,6 @@ class Feature(object):
     def feature_structure(self, keys: tuple):
         if keys not in self.feature_vector:
             self.feature_vector[keys] = [self.idx, 1]
-            # TODO: the feature idxs are serials - maybe we can just give a range?
-            self.features_idxs.append(self.idx)
             self.features_occurrences[self.idx] = 1
             self.idx += 1
         else:
@@ -47,10 +50,12 @@ class Feature(object):
             self.features_occurrences[self.feature_vector[keys][0]] += 1
 
     def feature_100(self):
+        Consts.print_status("feature_100", "Building")
         for history, tag in zip(self.histories, self.tags):
             self.feature_structure(("100", (history.get_current_word().lower(), tag)))
 
     def feature_101(self):
+        Consts.print_status("feature_101", "Building")
         for history, tag in zip(self.histories, self.tags):
             self.feature_structure(("101", (history.word_custom_suffix(1).lower(), tag)))
             current_word_len = len(history.get_current_word())
@@ -62,6 +67,7 @@ class Feature(object):
                 self.feature_structure(("101", (history.word_custom_suffix(4).lower(), tag)))
 
     def feature_102(self):
+        Consts.print_status("feature_102", "Building")
         for history, tag in zip(self.histories, self.tags):
             self.feature_structure(("102", (history.word_custom_prefix(1).lower(), tag)))
             current_word_len = len(history.get_current_word())
@@ -73,16 +79,32 @@ class Feature(object):
                 self.feature_structure(("102", (history.word_custom_prefix(4).lower(), tag)))
 
     def feature_103(self):
+        Consts.print_status("feature_103", "Building")
         for history, tag in zip(self.histories, self.tags):
             self.feature_structure(("103", (history.tags[0], history.tags[1], tag)))
 
     def feature_104(self):
+        Consts.print_status("feature_104", "Building")
         for history, tag in zip(self.histories, self.tags):
             self.feature_structure(("104", (history.tags[1], tag)))
 
     def feature_105(self):
+        Consts.print_status("feature_105", "Building")
         for tag in self.tags:
             self.feature_structure(("105", tag))
+
+    def _reduce_features(self):
+        Consts.print_status("_reduce_features", "Reducing")
+        self.idx = 0
+        survived_features = {}
+        survived_occurrences = {}
+        for feature_key, feature_value in self.feature_vector.items():
+            if feature_value[1] > 5:
+                survived_features[feature_key] = (self.idx, feature_value[1])
+                survived_occurrences[self.idx] = feature_value[1]
+                self.idx += 1
+        self.feature_vector = survived_features
+        self.features_occurrences = survived_occurrences
 
     # Inserts the key idx to 'history_features_idxs' only if the key exist
     def insert_idx(self, key: tuple):
