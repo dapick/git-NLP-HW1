@@ -16,14 +16,6 @@ class History(object):
     def get_current_word(self):
         return self.sentence[self.current_word_idx]
 
-    # Returns the current word idx first letters
-    def word_custom_prefix(self, idx: int) -> str:
-        return self.sentence[self.current_word_idx][:idx]
-
-    # Returns the current word idx last letters
-    def word_custom_suffix(self, idx: int) -> str:
-        return self.sentence[self.current_word_idx][-idx:]
-
 
 class Histories(object):
     # Returns a list of all possible histories and the tags given
