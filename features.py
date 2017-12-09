@@ -1,6 +1,9 @@
 from history import History, Histories
 from consts import Consts
 
+from multiprocessing.pool import Pool
+from functools import partial
+
 
 class Feature(object):
     histories = None
@@ -9,15 +12,12 @@ class Feature(object):
     features_funcs = None
     used_features = None
 
-    # key = (feature_number, (feature_definition))
-    # value = [feature_idx, number_of_times_occurs]
+    # Dict of: {(feature_number, (feature_definition)): [feature_idx, number_of_times_occurs]}
     feature_vector = None
-    # The number of occurrences for each feature
     # Dict of {(feature_idx): occurrence_number}
     features_occurrences = None
-
-    # List of features' idx which apply on a certain pair: (h, t)
-    history_features_idxs = None
+    # Dict of {(h, t): list of features applies}
+    history_tag_features = None
 
     def __init__(self, file_full_name: str=Consts.PATH_TO_TRAINING,
                  used_features: tuple=("100", "101", "102", "103", "104", "105")):
@@ -37,7 +37,9 @@ class Feature(object):
 
         self._reduce_features()
 
-        self.history_features_idxs = []
+        self.history_tag_features = {}
+        # Updates 'history_tag_features'
+        self._calculate_history_tag_features()
 
     # Gives an index for each feature
     def feature_structure(self, keys: tuple):
@@ -50,51 +52,43 @@ class Feature(object):
             self.features_occurrences[self.feature_vector[keys][0]] += 1
 
     def feature_100(self):
-        Consts.print_status("feature_100", "Building")
+        Consts.print_info("feature_100", "Building")
         for history, tag in zip(self.histories, self.tags):
             self.feature_structure(("100", (history.get_current_word().lower(), tag)))
 
     def feature_101(self):
-        Consts.print_status("feature_101", "Building")
+        Consts.print_info("feature_101", "Building")
         for history, tag in zip(self.histories, self.tags):
-            self.feature_structure(("101", (history.word_custom_suffix(1).lower(), tag)))
-            current_word_len = len(history.get_current_word())
-            if current_word_len >= 2:
-                self.feature_structure(("101", (history.word_custom_suffix(2).lower(), tag)))
-            if current_word_len >= 3:
-                self.feature_structure(("101", (history.word_custom_suffix(3).lower(), tag)))
-            if current_word_len >= 4:
-                self.feature_structure(("101", (history.word_custom_suffix(4).lower(), tag)))
+            current_word = history.get_current_word().lower()
+            for suffix in Consts.SUFFIXES:
+                if current_word.endswith(suffix):
+                    self.feature_structure(("101", (suffix, tag)))
 
     def feature_102(self):
-        Consts.print_status("feature_102", "Building")
+        Consts.print_info("feature_102", "Building")
         for history, tag in zip(self.histories, self.tags):
-            self.feature_structure(("102", (history.word_custom_prefix(1).lower(), tag)))
-            current_word_len = len(history.get_current_word())
-            if current_word_len >= 2:
-                self.feature_structure(("102", (history.word_custom_prefix(2).lower(), tag)))
-            if current_word_len >= 3:
-                self.feature_structure(("102", (history.word_custom_prefix(3).lower(), tag)))
-            if current_word_len >= 4:
-                self.feature_structure(("102", (history.word_custom_prefix(4).lower(), tag)))
+            current_word = history.get_current_word().lower()
+            for prefix in Consts.PREFIXES:
+                if current_word.startswith(prefix):
+                    self.feature_structure(("102", (prefix, tag)))
 
     def feature_103(self):
-        Consts.print_status("feature_103", "Building")
+        Consts.print_info("feature_103", "Building")
         for history, tag in zip(self.histories, self.tags):
             self.feature_structure(("103", (history.tags[0], history.tags[1], tag)))
 
     def feature_104(self):
-        Consts.print_status("feature_104", "Building")
+        Consts.print_info("feature_104", "Building")
         for history, tag in zip(self.histories, self.tags):
             self.feature_structure(("104", (history.tags[1], tag)))
 
     def feature_105(self):
-        Consts.print_status("feature_105", "Building")
+        Consts.print_info("feature_105", "Building")
         for tag in self.tags:
             self.feature_structure(("105", tag))
 
     def _reduce_features(self):
-        Consts.print_status("_reduce_features", "Reducing")
+        Consts.print_info("_reduce_features", "Reducing")
         self.idx = 0
         survived_features = {}
         survived_occurrences = {}
@@ -107,40 +101,57 @@ class Feature(object):
         self.features_occurrences = survived_occurrences
 
     # Inserts the key idx to 'history_features_idxs' only if the key exist
-    def insert_idx(self, key: tuple):
+    def insert_idx(self, key: tuple, history_features_idxs: list):
         feature_value = self.feature_vector.get(key)
         if feature_value:
-            self.history_features_idxs.append(feature_value[0])
+            history_features_idxs.append(feature_value[0])
 
-    # Returns the list 'history_features_idxs' updated to the given (h, t) pair
-    def history_matched_features(self, history: History, tag: str) -> list:
-        self.history_features_idxs = []
-        current_word_len = len(history.get_current_word())
-
+    # Calculates a list of features' idx which apply on a certain pair: (h, t)
+    def history_matched_features(self, history_tag: tuple) -> (tuple, list):
+        history_features_idxs = []
+        current_word = history_tag[0].get_current_word().lower()
         # Feature_100
         if "100" in self.used_features:
-            self.insert_idx(("100", (history.get_current_word().lower(), tag)))
-        # Feature_101 + Feature_102
-        if "101" in self.used_features and "102" in self.used_features:
-            self.insert_idx(("101", (history.word_custom_suffix(1).lower(), tag)))
-            self.insert_idx(("102", (history.word_custom_prefix(1).lower(), tag)))
-            if current_word_len >= 2:
-                self.insert_idx(("101", (history.word_custom_suffix(2).lower(), tag)))
-                self.insert_idx(("102", (history.word_custom_prefix(2).lower(), tag)))
-            if current_word_len >= 3:
-                self.insert_idx(("101", (history.word_custom_suffix(3).lower(), tag)))
-                self.insert_idx(("102", (history.word_custom_prefix(3).lower(), tag)))
-            if current_word_len >= 4:
-                self.insert_idx(("101", (history.word_custom_suffix(4).lower(), tag)))
-                self.insert_idx(("102", (history.word_custom_prefix(4).lower(), tag)))
+            self.insert_idx(("100", (current_word, history_tag[1])), history_features_idxs)
+        # Feature_101
+        if "101" in self.used_features:
+            for suffix in Consts.SUFFIXES:
+                if current_word.endswith(suffix):
+                    self.insert_idx(("101", (suffix, history_tag[1])), history_features_idxs)
+        # Feature_102
+        if "102" in self.used_features:
+            for prefix in Consts.PREFIXES:
+                if current_word.startswith(prefix):
+                    self.insert_idx(("102", (prefix, history_tag[1])), history_features_idxs)
         # Feature 103
         if "103" in self.used_features:
-            self.insert_idx(("103", (history.tags[0], history.tags[1], tag)))
+            self.insert_idx(("103", (history_tag[0].tags[0], history_tag[0].tags[1], history_tag[1])),
+                            history_features_idxs)
         # Feature 104
         if "104" in self.used_features:
-            self.insert_idx(("104", (history.tags[1], tag)))
+            self.insert_idx(("104", (history_tag[0].tags[1], history_tag[1])), history_features_idxs)
         # Feature 105
         if "105" in self.used_features:
-            self.insert_idx(("105", tag))
+            self.insert_idx(("105", history_tag[1]), history_features_idxs)
 
-        return self.history_features_idxs
+        # return history_tag[0], history_tag[1], history_features_idxs
+        self.history_tag_features[(history_tag[0], history_tag[1])] = history_features_idxs
+
+    # def _insert_history_tag_features_idxs(self, result: ApplyResult):
+    #     history, tag, features_idxs = result
+    #     self.history_tag_features[(history, tag)] = features_idxs
+
+    def _calculate_history_tag_features(self):
+        Consts.print_info("_calculate_history_tag_features", "Preprocessing")
+        # jobs_pool = Pool(4)
+        history_tag_list = [(history, tag) for history in self.histories for tag in Consts.POS_TAGS]
+        # self.history_tag_features = jobs_pool.apply_async(self.history_matched_features, history_tag_list,
+        #                                                   callback=self._insert_history_tag_features_idxs)
+        # jobs_pool.close()
+        # jobs_pool.join()
+        # map(self.history_matched_features, history_tag_list)
+        for history_tag_tuple in history_tag_list:
+            self.history_matched_features(history_tag_tuple)
+        # with open("trialDataFiles/outputAllFeatures.output", 'w') as f:
+        #     # print(self.history_tag_features, file=f)
+        #     print("Hello World", file=f)
