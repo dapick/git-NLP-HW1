@@ -1,7 +1,6 @@
 class Parsing(object):
 
     @staticmethod
-    # TODO: save also \n in the last character. Remember that!
     def parse_wtag_file_to_lists(file_full_name: str) -> (list, list):
         with open(file_full_name) as f:
             lines = f.readlines()
