@@ -19,7 +19,6 @@ class BasicModel(object):
 
     def __init__(self, file_full_name: str=Consts.PATH_TO_TRAINING):
         self.feature = Feature(file_full_name, ("100", "103", "104"))
-
         self.features_idx = list(self.feature.features_occurrences.keys())
 
         Consts.DEBUG = 1
