@@ -12,7 +12,6 @@ from functools import partial
 class BasicModel(object):
     feature = None
     features_idx = None
-    jobs_pool = None
 
     v_parameter = None
     # TODO: find which lambda should we use
@@ -25,8 +24,9 @@ class BasicModel(object):
         self._calculate_gradients_idxs()
 
         Consts.print_info("minimize", "Computing v_parameter")
-        optimize_result = minimize(self._L, np.zeros(len(self.feature.features_occurrences)),
-                                   jac=self._gradient, method="L-BFGS-B")
+        v_start_value = np.zeros(len(self.feature.features_occurrences))
+        optimize_result = minimize(fun=self._L, x0=v_start_value,
+                                   jac=self._gradient, method="L-BFGS-B", options={"disp": True})
         self.v_parameter = optimize_result.x
         Consts.DEBUG = 1
 
@@ -37,7 +37,11 @@ class BasicModel(object):
     # Calculate v sum in the idx where the feature applies for the pair: (h, t)
     def _calculate_v_sum(self, v_parameter, history: History, tag: str) -> float:
         Consts.print_debug("_calculate_v_sum for: " + history.get_current_word() + ", " + tag, "Calculating")
-        return sum(v_parameter[self.feature.history_tag_features[(history, tag)]])
+        # list_idx = self.feature.history_tag_features.get((history, tag))
+        # if list_idx:
+        #     return sum(v_parameter[list_idx])
+        # return 0
+        return sum(v_parameter[self.feature.history_tag_features.get((history, tag))])
 
     # Calculates the sum: sum(exp(v*f(h, t)))
     def _calculate_inner_sum(self, v_parameter, history: History) -> float:
@@ -60,16 +64,11 @@ class BasicModel(object):
 
     def _gradient(self, v_parameter):
         Consts.print_info("_gradient", "Calculating")
-        # self.jobs_pool = Pool(4)
 
-        with Pool(4) as self.jobs_pool:
-            gradient = self.jobs_pool.starmap(partial(self._derivative_k, v_parameter=v_parameter), self.features_idx)
+        with Pool(4) as jobs_pool:
+            gradient = jobs_pool.map(partial(self._derivative_k, v_parameter), self.features_idx)
 
-        # self.jobs_pool.close()
-        # self.jobs_pool.join()
-        return gradient
-
-        # return list(map(lambda x: self._derivative_k(v_parameter, x), self.features_idx))
+        return np.asarray(list(gradient))
 
     def _derivative_k(self, v_parameter, k: int) -> float:
         Consts.print_info("_derivative_" + str(k), "Calculating")

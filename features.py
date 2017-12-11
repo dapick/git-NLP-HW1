@@ -1,9 +1,6 @@
 from history import History, Histories
 from consts import Consts
 
-from multiprocessing.pool import Pool
-from functools import partial
-
 
 class Feature(object):
     histories = None
@@ -35,9 +32,8 @@ class Feature(object):
         for feature_type in used_features:
             self.features_funcs[feature_type]()
 
-        self._reduce_features()
+        # self._reduce_features()
 
-        self.history_tag_features = {}
         # Updates 'history_tag_features'
         self._calculate_history_tag_features()
 
@@ -107,51 +103,43 @@ class Feature(object):
             history_features_idxs.append(feature_value[0])
 
     # Calculates a list of features' idx which apply on a certain pair: (h, t)
-    def history_matched_features(self, history_tag: tuple) -> (tuple, list):
+    def history_matched_features(self, history: History, tag: str):
         history_features_idxs = []
-        current_word = history_tag[0].get_current_word().lower()
+        current_word = history.get_current_word().lower()
         # Feature_100
         if "100" in self.used_features:
-            self.insert_idx(("100", (current_word, history_tag[1])), history_features_idxs)
+            self.insert_idx(("100", (current_word, tag)), history_features_idxs)
         # Feature_101
         if "101" in self.used_features:
             for suffix in Consts.SUFFIXES:
                 if current_word.endswith(suffix):
-                    self.insert_idx(("101", (suffix, history_tag[1])), history_features_idxs)
+                    self.insert_idx(("101", (suffix, tag)), history_features_idxs)
         # Feature_102
         if "102" in self.used_features:
             for prefix in Consts.PREFIXES:
                 if current_word.startswith(prefix):
-                    self.insert_idx(("102", (prefix, history_tag[1])), history_features_idxs)
+                    self.insert_idx(("102", (prefix, tag)), history_features_idxs)
         # Feature 103
         if "103" in self.used_features:
-            self.insert_idx(("103", (history_tag[0].tags[0], history_tag[0].tags[1], history_tag[1])),
+            self.insert_idx(("103", (history.tags[0], history.tags[1], tag)),
                             history_features_idxs)
         # Feature 104
         if "104" in self.used_features:
-            self.insert_idx(("104", (history_tag[0].tags[1], history_tag[1])), history_features_idxs)
+            self.insert_idx(("104", (history.tags[1], tag)), history_features_idxs)
         # Feature 105
         if "105" in self.used_features:
-            self.insert_idx(("105", history_tag[1]), history_features_idxs)
+            self.insert_idx(("105", tag), history_features_idxs)
 
-        # return history_tag[0], history_tag[1], history_features_idxs
-        self.history_tag_features[(history_tag[0], history_tag[1])] = history_features_idxs
-
-    # def _insert_history_tag_features_idxs(self, result: ApplyResult):
-    #     history, tag, features_idxs = result
-    #     self.history_tag_features[(history, tag)] = features_idxs
+        # Saves the (h,t) in the dict only if they apply to some feature
+        # if history_features_idxs:
+        self.history_tag_features[(history, tag)] = history_features_idxs
 
     def _calculate_history_tag_features(self):
+        self.history_tag_features = {}
         Consts.print_info("_calculate_history_tag_features", "Preprocessing")
-        # jobs_pool = Pool(4)
         history_tag_list = [(history, tag) for history in self.histories for tag in Consts.POS_TAGS]
-        # self.history_tag_features = jobs_pool.apply_async(self.history_matched_features, history_tag_list,
-        #                                                   callback=self._insert_history_tag_features_idxs)
-        # jobs_pool.close()
-        # jobs_pool.join()
-        # map(self.history_matched_features, history_tag_list)
-        for history_tag_tuple in history_tag_list:
-            self.history_matched_features(history_tag_tuple)
-        # with open("trialDataFiles/outputAllFeatures.output", 'w') as f:
-        #     # print(self.history_tag_features, file=f)
-        #     print("Hello World", file=f)
+        for (history, tag) in history_tag_list:
+            self.history_matched_features(history, tag)
+        with open("trialDataFiles/outputAllFeatures.output", 'w') as f:
+            print(self.history_tag_features, file=f)
+            # print("Hello World", file=f)

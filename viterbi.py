@@ -13,7 +13,7 @@ class Viterbi:
         self.words = words
         self.tags = consts.Consts().POS_TAGS
 
-    def q(self, idx: int, tag: str, tag1: str, tag2: str):
+    def q(self, tag1: str, tag2: str, idx: int, tag: str):
         history = History([tag1, tag2], self.words, idx)
         return exp(self.basicModel.log_probability(history, tag))
 
@@ -22,7 +22,7 @@ class Viterbi:
         max_bp = '*'
         for i in range(0, (idx - 1)):
             t = self.tags.POS_TAGS[i]
-            cur = (pi[((idx - 1), t, u)] * self.q(idx, v, t, u))
+            cur = (pi[((idx - 1), t, u)] * self.q(t, u, idx, v))
             if max_prob < cur:
                 max_prob = cur
                 max_bp = [t, u]
