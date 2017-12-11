@@ -131,8 +131,8 @@ class Feature(object):
             self.insert_idx(("105", tag), history_features_idxs)
 
         # Saves the (h,t) in the dict only if they apply to some feature
-        # if history_features_idxs:
-        self.history_tag_features[(history, tag)] = history_features_idxs
+        if history_features_idxs:
+            self.history_tag_features[(history, tag)] = history_features_idxs
 
     def _calculate_history_tag_features(self):
         self.history_tag_features = {}
@@ -140,6 +140,6 @@ class Feature(object):
         history_tag_list = [(history, tag) for history in self.histories for tag in Consts.POS_TAGS]
         for (history, tag) in history_tag_list:
             self.history_matched_features(history, tag)
-        with open("trialDataFiles/outputAllFeatures.output", 'w') as f:
-            print(self.history_tag_features, file=f)
+        # with open("trialDataFiles/outputAllFeatures.output", 'w') as f:
+        #     print(self.history_tag_features, file=f)
             # print("Hello World", file=f)

@@ -37,11 +37,11 @@ class BasicModel(object):
     # Calculate v sum in the idx where the feature applies for the pair: (h, t)
     def _calculate_v_sum(self, v_parameter, history: History, tag: str) -> float:
         Consts.print_debug("_calculate_v_sum for: " + history.get_current_word() + ", " + tag, "Calculating")
-        # list_idx = self.feature.history_tag_features.get((history, tag))
-        # if list_idx:
-        #     return sum(v_parameter[list_idx])
-        # return 0
-        return sum(v_parameter[self.feature.history_tag_features.get((history, tag))])
+        list_idx = self.feature.history_tag_features.get((history, tag))
+        if list_idx:
+            return sum(v_parameter[list_idx])
+        return 0
+        # return sum(v_parameter[self.feature.history_tag_features.get((history, tag))])
 
     # Calculates the sum: sum(exp(v*f(h, t)))
     def _calculate_inner_sum(self, v_parameter, history: History) -> float:
@@ -75,11 +75,15 @@ class BasicModel(object):
         feature_sum = self.feature.features_occurrences[k]
 
         histories_sum = 0
-        for history in self.feature.histories:
-            for tag in Consts.POS_TAGS:
-                if k in self.feature.history_tag_features[(history, tag)]:
-                    histories_sum += self._calculate_v_sum(v_parameter, history, tag) / \
-                                     self._calculate_inner_sum(v_parameter, history)
+        # for history in self.feature.histories:
+        #     for tag in Consts.POS_TAGS:
+        #         if k in self.feature.history_tag_features[(history, tag)]:
+        #             histories_sum += self._calculate_v_sum(v_parameter, history, tag) / \
+        #                              self._calculate_inner_sum(v_parameter, history)
+        for (history, tag) in self.feature.history_tag_features.keys():
+            if k in self.feature.history_tag_features[(history, tag)]:
+                histories_sum += self._calculate_v_sum(v_parameter, history, tag) / \
+                                 self._calculate_inner_sum(v_parameter, history)
 
         return -(feature_sum - histories_sum - self.lambda_value*v_parameter[k])
 
