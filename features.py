@@ -32,10 +32,8 @@ class Feature(object):
         for feature_type in used_features:
             self.features_funcs[feature_type]()
 
-        # self._reduce_features()
-
         # Updates 'history_tag_features'
-        self._calculate_history_tag_features()
+        # self._calculate_history_tag_features()
 
     # Gives an index for each feature
     def feature_structure(self, keys: tuple):
@@ -143,3 +141,8 @@ class Feature(object):
         # with open("trialDataFiles/outputAllFeatures.output", 'w') as f:
         #     print(self.history_tag_features, file=f)
             # print("Hello World", file=f)
+
+    def count_features_types(self):
+        for feature_type in self.used_features:
+            count_feature = sum([1 if feature_num == feature_type else 0 for feature_num, _ in self.feature_vector])
+            Consts.print_info("feature_" + feature_type, "Has " + str(count_feature) + " features")
