@@ -2,6 +2,7 @@ class Parsing(object):
 
     @staticmethod
     def parse_wtag_file_to_lists(file_full_name: str) -> (list, list):
+        print(file_full_name)
         with open(file_full_name) as f:
             lines = f.readlines()
 
@@ -22,9 +23,11 @@ class Parsing(object):
             lines = f.readlines()
 
         lines = [line.split(' ') for line in lines]
-        sentences = []
+        sentences = {}
+        sentence_idx = 0
         for sentence in lines:
-            sentences.append([word.rstrip() for word in sentence])
+            sentences[sentence_idx] = ([word.rstrip() for word in sentence])
+            sentence_idx += 1
         return sentences
 
     @staticmethod
