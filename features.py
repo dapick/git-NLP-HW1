@@ -33,7 +33,7 @@ class Feature(object):
             self.features_funcs[feature_type]()
 
         # Updates 'history_tag_features'
-        # self._calculate_history_tag_features()
+        self.calculate_history_tag_features()
 
     # Gives an index for each feature
     def feature_structure(self, keys: tuple):
@@ -132,7 +132,7 @@ class Feature(object):
         if history_features_idxs:
             self.history_tag_features[(history, tag)] = history_features_idxs
 
-    def _calculate_history_tag_features(self):
+    def calculate_history_tag_features(self):
         self.history_tag_features = {}
         Consts.print_info("_calculate_history_tag_features", "Preprocessing")
         history_tag_list = [(history, tag) for history in self.histories for tag in Consts.POS_TAGS]

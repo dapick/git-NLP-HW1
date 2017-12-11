@@ -21,7 +21,7 @@ class BasicModel(object):
         self.feature = Feature(file_full_name, ("100", "103", "104"))
         self.features_idx = list(self.feature.features_occurrences.keys())
 
-        Consts.DEBUG = 1
+        Consts.DEBUG = 0
 
     def calculate_v_parameter(self):
         Consts.print_info("minimize", "Computing v_parameter")
