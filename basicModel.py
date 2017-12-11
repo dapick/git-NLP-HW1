@@ -22,11 +22,9 @@ class BasicModel(object):
 
         self.features_idx = list(self.feature.features_occurrences.keys())
 
-        self._calculate_v_parameter()
-
         Consts.DEBUG = 1
 
-    def _calculate_v_parameter(self):
+    def calculate_v_parameter(self):
         Consts.print_info("minimize", "Computing v_parameter")
         optimize_result = minimize(fun=self._L, x0=np.zeros(len(self.feature.features_occurrences)),
                                    jac=self._gradient, method="L-BFGS-B", options={"disp": True})
