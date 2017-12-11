@@ -20,19 +20,17 @@ class BasicModel(object):
     def __init__(self, file_full_name: str=Consts.PATH_TO_TRAINING):
         self.feature = Feature(file_full_name, ("100", "103", "104"))
 
-        # Updates 'features_idx'
-        self._calculate_gradients_idxs()
+        self.features_idx = list(self.feature.features_occurrences.keys())
 
-        Consts.print_info("minimize", "Computing v_parameter")
-        v_start_value = np.zeros(len(self.feature.features_occurrences))
-        optimize_result = minimize(fun=self._L, x0=v_start_value,
-                                   jac=self._gradient, method="L-BFGS-B", options={"disp": True})
-        self.v_parameter = optimize_result.x
+        self._calculate_v_parameter()
+
         Consts.DEBUG = 1
 
-    def _calculate_gradients_idxs(self):
-        Consts.print_info("_calculate_gradients_idxs", "Preprocessing")
-        self.features_idx = list(self.feature.features_occurrences.keys())
+    def _calculate_v_parameter(self):
+        Consts.print_info("minimize", "Computing v_parameter")
+        optimize_result = minimize(fun=self._L, x0=np.zeros(len(self.feature.features_occurrences)),
+                                   jac=self._gradient, method="L-BFGS-B", options={"disp": True})
+        self.v_parameter = optimize_result.x
 
     # Calculate v sum in the idx where the feature applies for the pair: (h, t)
     def _calculate_v_sum(self, v_parameter, history: History, tag: str) -> float:
@@ -41,7 +39,6 @@ class BasicModel(object):
         if list_idx:
             return sum(v_parameter[list_idx])
         return 0
-        # return sum(v_parameter[self.feature.history_tag_features.get((history, tag))])
 
     # Calculates the sum: sum(exp(v*f(h, t)))
     def _calculate_inner_sum(self, v_parameter, history: History) -> float:
@@ -75,11 +72,6 @@ class BasicModel(object):
         feature_sum = self.feature.features_occurrences[k]
 
         histories_sum = 0
-        # for history in self.feature.histories:
-        #     for tag in Consts.POS_TAGS:
-        #         if k in self.feature.history_tag_features[(history, tag)]:
-        #             histories_sum += self._calculate_v_sum(v_parameter, history, tag) / \
-        #                              self._calculate_inner_sum(v_parameter, history)
         for (history, tag) in self.feature.history_tag_features.keys():
             if k in self.feature.history_tag_features[(history, tag)]:
                 histories_sum += self._calculate_v_sum(v_parameter, history, tag) / \
