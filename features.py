@@ -11,7 +11,7 @@ class Feature(object):
 
     # Dict of: {(feature_number, (feature_definition)): [feature_idx, number_of_times_occurs]}
     feature_vector = None
-    # Dict of {(feature_idx): occurrence_number}
+    # List of: in place 'feature_idx': occurrence_number
     features_occurrences = None
     # Dict of {(h, t): list of features applies}
     history_tag_features = None
@@ -29,12 +29,12 @@ class Feature(object):
 
         self.idx = 0
         self.feature_vector = {}
-        self.features_occurrences = {}
+        self.features_occurrences = []
 
         for feature_type in used_features:
             self.features_funcs[feature_type]()
 
-        self._reduce_features()
+        # self._reduce_features()
 
         # Creates 'history_tag_features'
         self._calculate_history_tag_features()
@@ -43,7 +43,7 @@ class Feature(object):
     def feature_structure(self, keys: tuple):
         if keys not in self.feature_vector:
             self.feature_vector[keys] = [self.idx, 1]
-            self.features_occurrences[self.idx] = 1
+            self.features_occurrences.append(1)
             self.idx += 1
         else:
             self.feature_vector[keys][1] += 1
@@ -89,11 +89,11 @@ class Feature(object):
         Consts.print_info("_reduce_features", "Reducing")
         self.idx = 0
         survived_features = {}
-        survived_occurrences = {}
+        survived_occurrences = []
         for feature_key, feature_value in self.feature_vector.items():
             if feature_value[1] > 5:
                 survived_features[feature_key] = (self.idx, feature_value[1])
-                survived_occurrences[self.idx] = feature_value[1]
+                survived_occurrences.append(feature_value[1])
                 self.idx += 1
         self.feature_vector = survived_features
         self.features_occurrences = survived_occurrences
