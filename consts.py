@@ -28,6 +28,7 @@ class Consts:
     TAG = "Tag"
 
     DEBUG = 0
+    TIME = 0
 
     @staticmethod
     def print_info(function_name: str, message: str):
@@ -38,3 +39,9 @@ class Consts:
         # TODO: add a condition running defend on DEBUG
         if Consts.DEBUG == 1:
             print("-D-(" + function_name + "): " + message)
+
+    @staticmethod
+    def print_time(function_name: str, time: float):
+        # TODO: add a condition running defend on DEBUG
+        if Consts.TIME == 1:
+            print("-T-(" + function_name + "): took " + str(time) + " seconds")

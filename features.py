@@ -15,6 +15,8 @@ class Feature(object):
     features_occurrences = None
     # Dict of {(h, t): list of features applies}
     history_tag_features = None
+    # Dict of {h: list of tags applies}
+    tags_per_history = None
 
     def __init__(self, file_full_name: str=Consts.PATH_TO_TRAINING,
                  used_features: tuple=("100", "101", "102", "103", "104", "105")):
@@ -32,8 +34,10 @@ class Feature(object):
         for feature_type in used_features:
             self.features_funcs[feature_type]()
 
-        # Updates 'history_tag_features'
-        self.calculate_history_tag_features()
+        self._reduce_features()
+
+        # Creates 'history_tag_features'
+        self._calculate_history_tag_features()
 
     # Gives an index for each feature
     def feature_structure(self, keys: tuple):
@@ -131,16 +135,17 @@ class Feature(object):
         # Saves the (h,t) in the dict only if they apply to some feature
         if history_features_idxs:
             self.history_tag_features[(history, tag)] = history_features_idxs
+            self.tags_per_history[history].append(tag)
 
-    def calculate_history_tag_features(self):
-        self.history_tag_features = {}
+    def _calculate_history_tag_features(self):
         Consts.print_info("_calculate_history_tag_features", "Preprocessing")
+        self.history_tag_features = {}
         history_tag_list = [(history, tag) for history in self.histories for tag in Consts.POS_TAGS]
+        self.tags_per_history = {}
+        for history in self.histories:
+            self.tags_per_history[history] = []
         for (history, tag) in history_tag_list:
             self.history_matched_features(history, tag)
-        # with open("trialDataFiles/outputAllFeatures.output", 'w') as f:
-        #     print(self.history_tag_features, file=f)
-            # print("Hello World", file=f)
 
     def count_features_types(self):
         for feature_type in self.used_features:
