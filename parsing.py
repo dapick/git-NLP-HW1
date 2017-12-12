@@ -29,7 +29,7 @@ class Parsing(object):
 
     @staticmethod
     def parse_lists_to_wtag_file(sentences: list, tags: list, file_full_name: str):
-        with open(file_full_name, 'w') as f:
+        with open(file_full_name, 'w+') as f:
             num_of_sentences = len(sentences)
             for idx_sentence, (sentence, sentence_tags) in enumerate(zip(sentences, tags)):
                 sentence_length = len(sentence)

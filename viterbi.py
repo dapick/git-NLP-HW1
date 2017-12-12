@@ -1,6 +1,6 @@
 from basicModel import BasicModel
 from history import History
-import consts
+from consts import Consts
 from math import exp
 
 
@@ -9,9 +9,9 @@ class Viterbi:
 
     # TODO: getting list of words
     def __init__(self, words: list):
-        self.basicModel = BasicModel()
+        self.basicModel = BasicModel(Consts.TAG)
         self.words = words
-        self.tags = consts.Consts().POS_TAGS
+        self.tags = Consts.POS_TAGS
 
     def q(self, tag1: str, tag2: str, idx: int, tag: str):
         history = History([tag1, tag2], self.words, idx)
@@ -28,12 +28,12 @@ class Viterbi:
                 max_bp = [t, u]
         return [max_prob, max_bp]
 
-    def run_viterbi(self):
+    def run_viterbi(self)-> list:
         # initialization
         num_words = len(self.words)
         pi = {(0, '*', '*'): 1}
         bp = {}
-        res = {}
+        res = []
 
         for k in range(1, num_words-1):
             for i, u in enumerate(self.tags):
@@ -46,8 +46,10 @@ class Viterbi:
                 v = self.tags[j]
                 max_n, t_n = self.max_prob(pi, num_words, u, v)
 
-        for k in range(0, (num_words-2)):
-            res[k] = bp[((k+2), t_n[0], t_n[1])]
+        for k in reversed(range(0, (num_words-2))):
+            res.append(bp[((k+2), t_n[0], t_n[1])])
+
+        print(res)
 
         return res
 
