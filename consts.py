@@ -24,6 +24,9 @@ class Consts:
     PATH_TO_TEST = "data/test.wtag"
     PATH_TO_COMPETITION = "data/comp.words"
 
+    TRAIN = "Train"
+    TAG = "Tag"
+
     DEBUG = 0
 
     @staticmethod
