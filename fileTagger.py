@@ -8,46 +8,44 @@ class Tagger:
 
     # input file
     word_file = None
-    word_dict = None
+    sentences_list = None
 
     # output file
     tagged_file = None
-    word_tagged_dict = None
+    tags_list = None
 
     # tagger
     viterbi = None
 
     def __init__(self, word_file: str=Consts.PATH_TO_COMPETITION):
-        # self.word_file = Consts.PATH_TO_COMPETITION
         self.word_file = word_file
-        self.word_dict = Parsing.parse_words_file_to_list(self.word_file)
-        self.word_tagged_dict = {}
+        self.sentences_list = Parsing.parse_words_file_to_list(self.word_file)
 
-    def sentence_tagger(self, sen: list) ->list:
-        Consts.print_info("sentence_tagger", "Tagging sentence " + sen)
-        # self.viterbi = Viterbi(sen)
-        #self.word_tagged_dict[0] = self.viterbi.run_viterbi()
-        #print(self.word_tagged_dict[0])
+        self.tagged_file = self._get_tagged_file_name()
+        self.tags_list = []
+
+    def _get_tagged_file_name(self):
+        ret_file = self.word_file
+        return ret_file.replace("words", "wtag")
+
+    def _sentence_tagger(self, sen: list) ->list:
+        print("sentence_tagger", "Tagging sentence ", sen)
+        self.viterbi = Viterbi(sen)
+
+        tags = self.viterbi.run_viterbi()
+
+        self.tags_list.append(tags)
+
 
     def file_tagger(self):
         Consts.print_info("tag_file", "Tagging file " + self.word_file)
-        for sen in self.word_dict:
-            self.sentence_tagger(sen)
+        for sen in self.sentences_list:
+            self._sentence_tagger(sen)
 
+        Parsing.parse_lists_to_wtag_file(self.sentences_list, self.tags_list, self.tagged_file)
 
-    def print_to_file(self):
-        with open(self.tagged_file, 'r+') as f:
-            for sen in sorted(self.word_tagged_dict):
-                [print(word_tag, file=f) for word_tag in sen]
+    def calculate_percision(self, compare_file: str):
+        compare_wtag_list = Parsing.parse_wtag_file_to_lists(compare_file)
 
-
-
-
-
-if __name__ == '__main__':
-    tagger = Tagger()
-    print(tagger.word_dict)
-    tagger.sentence_tagger(tagger.word_dict[0])
-    print(tagger.word_tagged_dict[0])
 
 
