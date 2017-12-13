@@ -52,5 +52,3 @@ class Viterbi:
         print(res)
 
         return res
-
-

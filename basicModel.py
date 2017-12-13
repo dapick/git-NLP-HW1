@@ -5,15 +5,12 @@ from consts import Consts
 
 import numpy as np
 from math import log, exp
-from multiprocessing.pool import Pool
-from functools import partial
 
 from time import time
 
 
 class BasicModel(object):
     feature = None
-    features_idx = None
     features_amount = None
     features_occurrences_ndarray = None
 
@@ -33,23 +30,26 @@ class BasicModel(object):
     histories_sum = None
 
     def __init__(self, method: str, file_full_name: str=Consts.PATH_TO_TRAINING):
-        if method == Consts.TRAIN:
-            self._training(file_full_name)
-        # else:
-        #     if method == Consts.TAG:
-        #         self._set_internal_values()
-
-    def _training(self, file_full_name: str=Consts.PATH_TO_TRAINING):
-        self.feature = Feature(file_full_name, ("100", "103", "104"))
-        self.features_amount = len(self.feature.features_occurrences)
-        self.features_occurrences_ndarray = np.asarray(self.feature.features_occurrences)
-        self.features_idx = range(0, self.features_amount)
         self.exp_per_history_tag = {}
         self.inner_sum = {}
+
+        if method == Consts.TRAIN:
+            self._training(file_full_name)
+        else:
+            if method == Consts.TAG:
+                self._set_internal_values()
+
+    def _training(self, file_full_name: str=Consts.PATH_TO_TRAINING):
+        self.feature = Feature(Consts.TRAIN, ["100", "103", "104"], file_full_name)
+        self.features_amount = len(self.feature.features_occurrences)
+        self.features_occurrences_ndarray = np.asarray(self.feature.features_occurrences)
         self.v_parameter = self._calculate_v_parameter()
         self.histories_sum = {}
 
-    # def _set_internal_values(self):
+    def _set_internal_values(self):
+        with open("../dataFromTraining/v_as_list", 'r') as f:
+            self.v_parameter = np.asarray([float(line.rstrip()) for line in f.readlines()])
+        self.feature = Feature(Consts.TAG)
 
     def _calculate_v_parameter(self):
         Consts.print_info("minimize", "Computing v_parameter")
@@ -58,20 +58,25 @@ class BasicModel(object):
         return optimize_result.x
 
     # Calculate v sum in the idx where the feature applies for the pair: (h, t)
-    def _calculate_v_sum(self, v_parameter, history: History, tag: str) -> float:
+    def _calculate_v_sum(self, history: History, tag: str) -> float:
         # Consts.print_debug("_calculate_v_sum for: " + history.get_current_word() + ", " + tag, "Calculating")
         list_idx = self.feature.history_tag_features.get((history, tag))
+        if not list_idx:
+            list_idx = self.feature.history_matched_features(history, tag)
         if list_idx:
-            return sum(v_parameter[list_idx])
+            return sum(self.v_parameter[list_idx])
         return 0
 
     # Calculates the sum: sum(exp(v*f(h, t)))
-    def _calculate_inner_sum(self, v_parameter, history: History) -> float:
+    def _calculate_inner_sum(self, history: History) -> float:
         # Consts.print_debug("_calculate_inner_sum for: " + history.get_current_word(), "Calculating")
         count = 0
-        for tag in self.feature.tags_per_history[history]:
-            self.exp_per_history_tag[(history, tag)] = exp(self._calculate_v_sum(v_parameter, history, tag))
-            count += self.exp_per_history_tag[(history, tag)]
+        for tag in Consts.POS_TAGS:
+            v_sum = self.exp_per_history_tag.get((history, tag))
+            if not v_sum:
+                v_sum = exp(self._calculate_v_sum(history, tag))
+                self.exp_per_history_tag[(history, tag)] = v_sum
+            count += v_sum
         return count
 
     def _v_squares(self, v_parameter):
@@ -111,6 +116,16 @@ class BasicModel(object):
 
     # Calculates log(p(y|x;v))
     def log_probability(self, history: History, tag: str) -> float:
-        # TODO: save calculates for inner_sum per history
-        return self._calculate_v_sum(self.v_parameter, history, tag) - \
-               log(self._calculate_inner_sum(self.v_parameter, history))
+        v_sum = self.exp_per_history_tag.get((history, tag))
+        if v_sum:
+            v_sum = log(v_sum)
+        else:
+            v_sum = self._calculate_v_sum(history, tag)
+            self.exp_per_history_tag[(history, tag)] = exp(v_sum)
+
+        inner_sum = self.inner_sum.get(history)
+        if not inner_sum:
+            inner_sum = self._calculate_inner_sum(history)
+            self.inner_sum[history] = inner_sum
+
+        return v_sum - log(inner_sum)

@@ -2,7 +2,11 @@ import unittest
 
 from consts import Consts
 from basicModel import BasicModel
+from features import Feature
+from history import History
+
 import numpy as np
+from math import exp
 
 
 class MyTestCase(unittest.TestCase):
@@ -39,7 +43,24 @@ class MyTestCase(unittest.TestCase):
 
     def test_calculate_v_for_all_sentences(self):
         basic_model = BasicModel(Consts.TRAIN, "../" + Consts.PATH_TO_TRAINING)
-        print(basic_model.v_parameter)
+        with open('../dataFromTraining/v_as_ndaaray', 'w+') as f:
+            print(basic_model.v_parameter, file=f)
+        with open('../dataFromTraining/v_as_list', 'w+') as f:
+            print(list(basic_model.v_parameter), file=f)
+
+    def test_save_internal_fields(self):
+        feature = Feature(Consts.TRAIN, ["100", "103", "104"], "../" + Consts.PATH_TO_TRAINING)
+        basic_model = BasicModel(Consts.TAG)
+        self.assertEqual(basic_model.feature.feature_vector, feature.feature_vector)
+
+    def test_log_probability(self):
+        basic_model = BasicModel(Consts.TAG)
+        history = History(['*', '*'],
+                          ['The', 'Treasury', 'is', 'still', 'working', 'out', 'the', 'details', 'with', 'bank',
+                           'trade', 'associations', 'and', 'the', 'other', 'government', 'agencies', 'that', 'have',
+                           'a', 'hand', 'in', 'fighting', 'money', 'laundering', '.'], 0)
+        self.assertEqual(exp(basic_model.log_probability(history, 'DT')), 0.9981080577536964)
+        self.assertEqual(exp(basic_model.log_probability(history, 'NN')), 0.0001302680807040611)
 
 
 if __name__ == '__main__':

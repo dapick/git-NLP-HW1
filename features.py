@@ -1,6 +1,8 @@
 from history import History, Histories
 from consts import Consts
 
+import pickle
+
 
 class Feature(object):
     histories = None
@@ -18,15 +20,19 @@ class Feature(object):
     # Dict of {h: list of tags applies}
     tags_per_history = None
 
-    def __init__(self, file_full_name: str=Consts.PATH_TO_TRAINING,
-                 used_features: tuple=("100", "101", "102", "103", "104", "105")):
+    def __init__(self, method: str, used_features: list=None, file_full_name: str=None):
+        if method == Consts.TRAIN:
+            self._training(used_features, file_full_name)
+        else:
+            if method == Consts.TAG:
+                self._set_internal_values()
+
+    def _training(self, used_features: list, file_full_name: str=Consts.PATH_TO_TRAINING):
+        self.features_funcs = {"100": self.feature_100, "101": self.feature_101, "102": self.feature_102,
+                               "103": self.feature_103, "104": self.feature_104, "105": self.feature_105}
         self.histories, self.tags = \
             Histories.build_history_list_and_tags_list(file_full_name)
         self.used_features = used_features
-
-        self.features_funcs = {"100": self.feature_100, "101": self.feature_101, "102": self.feature_102,
-                               "103": self.feature_103, "104": self.feature_104, "105": self.feature_105}
-
         self.idx = 0
         self.feature_vector = {}
         self.features_occurrences = []
@@ -34,10 +40,16 @@ class Feature(object):
         for feature_type in used_features:
             self.features_funcs[feature_type]()
 
-        # self._reduce_features()
-
         # Creates 'history_tag_features'
-        self._calculate_history_tag_features()
+        # self._calculate_history_tag_features()
+
+        with open("../dataFromTraining/internal_values_of_feature_of_basic_training", 'wb+') as f:
+            pickle.dump([self.feature_vector, self.used_features], f, protocol=-1)
+
+    def _set_internal_values(self):
+        self.history_tag_features = {}
+        with open("../dataFromTraining/internal_values_of_feature_of_basic_training", 'rb') as f:
+            self.feature_vector, self.used_features = pickle.load(f)
 
     # Gives an index for each feature
     def feature_structure(self, keys: tuple):
@@ -132,10 +144,9 @@ class Feature(object):
         if "105" in self.used_features:
             self.insert_idx(("105", tag), history_features_idxs)
 
-        # Saves the (h,t) in the dict only if they apply to some feature
-        if history_features_idxs:
-            self.history_tag_features[(history, tag)] = history_features_idxs
-            self.tags_per_history[history].append(tag)
+        # Saves the (h,t) in the dict 'history_tag_features'
+        self.history_tag_features[(history, tag)] = history_features_idxs
+        return history_features_idxs
 
     def _calculate_history_tag_features(self):
         Consts.print_info("_calculate_history_tag_features", "Preprocessing")
