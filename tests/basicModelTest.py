@@ -43,13 +43,13 @@ class MyTestCase(unittest.TestCase):
 
     def test_calculate_v_for_all_sentences(self):
         basic_model = BasicModel(Consts.TRAIN, "../" + Consts.PATH_TO_TRAINING)
-        with open('../dataFromTraining/v_as_ndaaray', 'w+') as f:
+        with open('../data_from_training/v_as_ndaaray', 'w+') as f:
             print(basic_model.v_parameter, file=f)
-        with open('../dataFromTraining/v_as_list', 'w+') as f:
+        with open('../data_from_training/v_as_list', 'w+') as f:
             print(list(basic_model.v_parameter), file=f)
 
     def test_save_internal_fields(self):
-        feature = Feature(Consts.TRAIN, ["100", "103", "104"], "../" + Consts.PATH_TO_TRAINING)
+        feature = Feature(Consts.TRAIN, Consts.BASIC_MODEL, ["100", "103", "104"], "../" + Consts.PATH_TO_TRAINING)
         basic_model = BasicModel(Consts.TAG)
         self.assertEqual(basic_model.feature.feature_vector, feature.feature_vector)
 

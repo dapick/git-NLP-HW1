@@ -25,6 +25,9 @@ class Consts:
     PATH_TO_COMPETITION = "data/comp.words"
 
     TRAIN = "Train"
+    BASIC_MODEL = "basic_model model"
+    ADVANCED_MODEL = "advanced model"
+
     TAG = "Tag"
 
     DEBUG = 0
@@ -36,12 +39,10 @@ class Consts:
 
     @staticmethod
     def print_debug(function_name: str, message: str):
-        # TODO: add a condition running defend on DEBUG
         if Consts.DEBUG == 1:
             print("-D-(" + function_name + "): " + message)
 
     @staticmethod
     def print_time(function_name: str, time: float):
-        # TODO: add a condition running defend on DEBUG
         if Consts.TIME == 1:
             print("-T-(" + function_name + "): took " + str(time) + " seconds")
