@@ -13,16 +13,16 @@ class Viterbi:
         self.words = words
         self.tags = Consts.POS_TAGS
 
-    def q(self, tag1: str, tag2: str, idx: int, tag: str):
+    def q(self, tag1: str, tag2: str, idx: int, tag_idx: int):
         history = History([tag1, tag2], self.words, idx)
-        return exp(self.basicModel.log_probability(history, tag))
+        return exp(self.basicModel.log_probability(history, tag_idx))
 
-    def max_prob(self, pi:  dict, idx:  int, u: str, v: str):
+    def max_prob(self, pi:  dict, idx:  int, u: str, tag_idx: int):
         max_prob = 0
         max_bp = '*'
         for i in range(0, (idx - 1)):
             t = self.tags.POS_TAGS[i]
-            cur = (pi[((idx - 1), t, u)] * self.q(t, u, idx, v))
+            cur = (pi[((idx - 1), t, u)] * self.q(t, u, idx, tag_idx))
             if max_prob < cur:
                 max_prob = cur
                 max_bp = [t, u]
@@ -39,7 +39,7 @@ class Viterbi:
             for i, u in enumerate(self.tags):
                 for j in range(0, i):
                     v = self.tags[j]
-                    pi[(k, u, v)], bp[(k, u, v)] = self.max_prob(pi, k, u, v)
+                    pi[(k, u, v)], bp[(k, u, v)] = self.max_prob(pi, k, u, j)
 
         for i, u in enumerate(self.tags):
             for j in range(0, i):

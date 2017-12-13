@@ -4,7 +4,7 @@ from consts import Consts
 from training import Training
 
 import numpy as np
-from math import log, exp
+from math import log
 import pickle
 
 
@@ -15,18 +15,14 @@ class BasicModel(object):
 
     # Common values between iterations
 
-    # Dict of: {(h, t): e^(v*f(h, t))}
-    exp_per_history_tag = None
-    # Dict of: {h: sum of all the values in 'v_sum_per_history_tag' for h}
-    # e.g. for each history saves the sum(e^(v*f(h, t)) for all t in tags
+    # Dict of: {h: ndarrag of v*f(h, t) for every possible tag}
     inner_sum = None
 
     def __init__(self, method: str, file_full_name: str=Consts.PATH_TO_TRAINING):
         if method == Consts.TRAIN:
             self._training(file_full_name)
-        else:
-            if method == Consts.TAG:
-                self._set_internal_values()
+        elif method == Consts.TAG:
+            self._set_internal_values()
 
     def _training(self, file_full_name: str=Consts.PATH_TO_TRAINING):
         self.v_parameter = Training(Consts.BASIC_MODEL, ["100", "103", "104"], file_full_name).v_parameter
@@ -43,40 +39,26 @@ class BasicModel(object):
         #     self.v_parameter = pickle.load(f)
         self.feature = Feature(Consts.TAG, Consts.BASIC_MODEL)
 
-    # Calculate v sum in the idx where the feature applies for the pair: (h, t)
-    def _calculate_v_sum(self, history: History, tag: str) -> float:
-        # Consts.print_debug("_calculate_v_sum for: " + history.get_current_word() + ", " + tag, "Calculating")
-        list_idx = self.feature.history_tag_features.get((history, tag))
-        if not list_idx:
-            list_idx = self.feature.history_matched_features(history, tag)
-        if list_idx:
-            return sum(self.v_parameter[list_idx])
-        return 0
+    def _get_applied_features(self, history: History, tag: str) -> list:
+        list_idxs = self.feature.history_tag_features.get((history, tag))
+        if list_idxs is None:
+            list_idxs = self.feature.history_matched_features(history, tag)
+        return list_idxs
 
     # Calculates the sum: sum(exp(v*f(h, t)))
     def _calculate_inner_sum(self, history: History) -> float:
         # Consts.print_debug("_calculate_inner_sum for: " + history.get_current_word(), "Calculating")
-        count = 0
-        for tag in Consts.POS_TAGS:
-            v_sum = self.exp_per_history_tag.get((history, tag))
-            if not v_sum:
-                v_sum = exp(self._calculate_v_sum(history, tag))
-                self.exp_per_history_tag[(history, tag)] = v_sum
-            count += v_sum
-        return count
+        inner_sum = self.inner_sum.get(history)
+        if inner_sum is None:
+            features_on_history = [self._get_applied_features(history, tag) for tag in Consts.POS_TAGS]
+            inner_sum = np.asarray(
+                [sum(self.v_parameter[features_idxs]) for features_idxs in features_on_history])
+            self.inner_sum[history] = inner_sum
+        return sum(np.exp(inner_sum))
 
     # Calculates log(p(y|x;v))
-    def log_probability(self, history: History, tag: str) -> float:
-        v_sum = self.exp_per_history_tag.get((history, tag))
-        if v_sum:
-            v_sum = log(v_sum)
-        else:
-            v_sum = self._calculate_v_sum(history, tag)
-            self.exp_per_history_tag[(history, tag)] = exp(v_sum)
-
-        inner_sum = self.inner_sum.get(history)
-        if not inner_sum:
-            inner_sum = self._calculate_inner_sum(history)
-            self.inner_sum[history] = inner_sum
+    def log_probability(self, history: History, tag_idx: int) -> float:
+        inner_sum = self._calculate_inner_sum(history)
+        v_sum = self.inner_sum[history][tag_idx]
 
         return v_sum - log(inner_sum)

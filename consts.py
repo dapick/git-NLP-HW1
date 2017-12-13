@@ -1,7 +1,7 @@
 class Consts:
-    POS_TAGS = {'VBN', 'PRP$', 'PRP', '-LRB-', 'WP', 'PDT', 'VBP', ',', 'NNPS', 'WDT', 'NN', 'EX', '``', 'VBG', 'RP',
+    POS_TAGS = ['VBN', 'PRP$', 'PRP', '-LRB-', 'WP', 'PDT', 'VBP', ',', 'NNPS', 'WDT', 'NN', 'EX', '``', 'VBG', 'RP',
                 'TO', 'VBZ', 'VBD', 'JJ', 'NNP', 'FW', 'NNS', 'MD', 'CC', 'DT', '$', 'WP$', 'POS', '.', 'VB', 'RB',
-                'SYM', ':', 'CD', '-RRB-', 'JJR', 'RBS', 'WRB', '#', 'JJS', 'UH', 'RBR', "''", 'IN'}
+                'SYM', ':', 'CD', '-RRB-', 'JJR', 'RBS', 'WRB', '#', 'JJS', 'UH', 'RBR', "''", 'IN']
 
     PREFIXES = ['a', 'anti', 'back', 'be', 'by', 'co', 'de', 'dis', 'down', 'en', 'em', 'ex', 'fore', 'hind', 'mid',
                 'midi', 'mini', 'mis', 'off', 'on', 'out', 'over', 'post', 'pre', 'pro', 're', 'self', 'step', 'twi',

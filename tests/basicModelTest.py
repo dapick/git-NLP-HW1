@@ -59,8 +59,17 @@ class MyTestCase(unittest.TestCase):
                           ['The', 'Treasury', 'is', 'still', 'working', 'out', 'the', 'details', 'with', 'bank',
                            'trade', 'associations', 'and', 'the', 'other', 'government', 'agencies', 'that', 'have',
                            'a', 'hand', 'in', 'fighting', 'money', 'laundering', '.'], 0)
-        self.assertEqual(exp(basic_model.log_probability(history, 'DT')), 0.9981080577536964)
-        self.assertEqual(exp(basic_model.log_probability(history, 'NN')), 0.0001302680807040611)
+        self.assertEqual(exp(basic_model.log_probability(history, 24)), 0.9981080577536964)  # tag = 'DT'
+        self.assertEqual(exp(basic_model.log_probability(history, 0)), 3.965426009950786e-05)  # tag = 'VBN'
+
+        max_prob = 0
+        best_tag = ''
+        for tag_idx, tag in enumerate(Consts.POS_TAGS):
+            cur_prob = exp(basic_model.log_probability(history, tag_idx))
+            if cur_prob > max_prob:
+                max_prob = cur_prob
+                best_tag = tag
+        self.assertEqual(best_tag, 'DT')
 
 
 if __name__ == '__main__':
