@@ -13,7 +13,7 @@ class Feature(object):
 
     # Dict of: {(feature_number, (feature_definition)): [feature_idx, number_of_times_occurs]}
     feature_vector = None
-    # List of: in place 'feature_idx': occurrence_number
+    # List of: in place 'feature_idx' there is the occurrence_number
     features_occurrences = None
     # Dict of {(h, t): list of features applies}
     history_tag_features = None

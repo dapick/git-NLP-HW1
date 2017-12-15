@@ -32,7 +32,6 @@ class Training(object):
         self.feature = Feature(Consts.TRAIN, model, used_features, file_full_name)
         self.features_amount = len(self.feature.features_occurrences)
         self.features_occurrences_ndarray = np.asarray(self.feature.features_occurrences)
-        self.histories_sum = {}
         self.exp_per_history_tag = {}
         self.inner_sum = {}
         self.v_parameter = self._calculate_v_parameter()
@@ -56,8 +55,9 @@ class Training(object):
         # Consts.print_debug("_calculate_inner_sum for: " + history.get_current_word(), "Calculating")
         count = 0
         for tag in self.feature.tags_per_history[history]:
-            self.exp_per_history_tag[(history, tag)] = exp(self._calculate_v_sum(v_parameter, history, tag))
-            count += self.exp_per_history_tag[(history, tag)]
+            exp_per_history_tag = exp(self._calculate_v_sum(v_parameter, history, tag))
+            count += exp_per_history_tag
+            self.exp_per_history_tag[(history, tag)] = exp_per_history_tag
         return count
 
     def _v_squares(self, v_parameter):
