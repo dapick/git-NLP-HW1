@@ -28,24 +28,24 @@ class Tagger:
         ret_file = self.word_file
         return ret_file.replace("words", "wtag")
 
-    def _sentence_tagger(self, sen: list) ->list:
-        print("sentence_tagger", "Tagging sentence ", sen)
+    def _tag_sentence(self, sen: list) ->list:
+        Consts.print_info("sentence_tagger", "Tagging sentence " + str(sen))
         self.viterbi = Viterbi(sen)
-
         tags = self.viterbi.run_viterbi()
+        # self.tags_list.append(tags)
 
-        self.tags_list.append(tags)
-
-
-    def file_tagger(self):
+    def tag(self):
         Consts.print_info("tag_file", "Tagging file " + self.word_file)
         for sen in self.sentences_list:
-            self._sentence_tagger(sen)
+            self._tag_sentence(sen)
 
         Parsing.parse_lists_to_wtag_file(self.sentences_list, self.tags_list, self.tagged_file)
 
+    # TODO: not done
     def calculate_percision(self, compare_file: str):
         compare_wtag_list = Parsing.parse_wtag_file_to_lists(compare_file)
 
 
-
+if __name__ == '__main__':
+    file_tagger = Tagger("tests/trialDataFiles/trialTwoSentences.words")
+    file_tagger.tag()
