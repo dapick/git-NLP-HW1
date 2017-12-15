@@ -30,13 +30,11 @@ class BasicModel(object):
             pickle.dump(self.v_parameter, f, protocol=-1)
 
     def _set_internal_values(self):
-        self.exp_per_history_tag = {}
         self.inner_sum = {}
-        with open("../data_from_training/basic_model/v_as_list", 'r') as f:
-            self.v_parameter = np.asarray([float(line.rstrip()) for line in f.readlines()])
-        # TODO: Uncomment after running evaluation on v again on train.wtag
-        # with open("../data_from_training/basic_model/v_parameter", 'rb') as f:
-        #     self.v_parameter = pickle.load(f)
+        # with open("../data_from_training/basic_model/v_as_list", 'r') as f:
+        #     self.v_parameter = np.asarray([float(line.rstrip()) for line in f.readlines()])
+        with open("../data_from_training/basic_model/v_parameter", 'rb') as f:
+            self.v_parameter = pickle.load(f)
         self.feature = Feature(Consts.TAG, Consts.BASIC_MODEL)
 
     def _get_applied_features(self, history: History, tag: str) -> list:
