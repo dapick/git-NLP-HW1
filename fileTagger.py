@@ -32,7 +32,7 @@ class Tagger:
         Consts.print_info("sentence_tagger", "Tagging sentence " + str(sen))
         self.viterbi = Viterbi(sen)
         tags = self.viterbi.run_viterbi()
-        # self.tags_list.append(tags)
+        self.tags_list.append(tags)
 
     def tag(self):
         Consts.print_info("tag_file", "Tagging file " + self.word_file)
@@ -47,5 +47,5 @@ class Tagger:
 
 
 if __name__ == '__main__':
-    file_tagger = Tagger("tests/trialDataFiles/trialTwoSentences.words")
+    file_tagger = Tagger("tests/trialDataFiles/short.words")
     file_tagger.tag()
