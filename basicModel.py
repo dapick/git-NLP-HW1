@@ -45,7 +45,6 @@ class BasicModel(object):
 
     # Calculates the sum: sum(exp(v*f(h, t)))
     def _calculate_inner_sum(self, history: History) -> float:
-        # Consts.print_debug("_calculate_inner_sum for: " + history.get_current_word(), "Calculating")
         inner_sum = self.inner_sum.get(history)
         if inner_sum is None:
             features_on_history = [self._get_applied_features(history, tag) for tag in Consts.POS_TAGS]

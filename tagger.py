@@ -1,7 +1,7 @@
-import numpy as np
 from consts import Consts
 from viterbi import Viterbi
 from parsing import Parsing
+from basicModel import BasicModel
 
 
 class Tagger:
@@ -17,9 +17,12 @@ class Tagger:
     # tagger
     viterbi = None
 
+    basic_model = None
+
     def __init__(self, word_file: str=Consts.PATH_TO_COMPETITION):
         self.word_file = word_file
         self.sentences_list = Parsing.parse_words_file_to_list(self.word_file)
+        self.basic_model = BasicModel(Consts.TAG)
 
         self.tagged_file = self._get_tagged_file_name()
         self.tags_list = []
@@ -28,9 +31,9 @@ class Tagger:
         ret_file = self.word_file
         return ret_file.replace("words", "wtag")
 
-    def _tag_sentence(self, sen: list) ->list:
+    def _tag_sentence(self, sen: list):
         Consts.print_info("sentence_tagger", "Tagging sentence " + str(sen))
-        self.viterbi = Viterbi(sen)
+        self.viterbi = Viterbi(sen, self.basic_model)
         tags = self.viterbi.run_viterbi()
         self.tags_list.append(tags)
 
@@ -44,8 +47,3 @@ class Tagger:
     # TODO: not done
     def calculate_percision(self, compare_file: str):
         compare_wtag_list = Parsing.parse_wtag_file_to_lists(compare_file)
-
-
-if __name__ == '__main__':
-    file_tagger = Tagger("tests/trialDataFiles/short.words")
-    file_tagger.tag()
