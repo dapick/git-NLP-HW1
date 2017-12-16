@@ -1,100 +1,80 @@
+from time import time
+
 from basicModel import BasicModel
 from history import History
 from consts import Consts
+
 from math import exp
-from time import time
+import numpy as np
+
 
 class Viterbi:
-    basicModel = None
+    basic_model = None
 
-    def __init__(self, words: list):
-        self.basicModel = BasicModel(Consts.TAG)
+    def __init__(self, words: list, basic_model: BasicModel):
+        self.basic_model = basic_model
         self.words = words
         self.tags = Consts.POS_TAGS
-        self.prev_tags = {-1: [], -2: []}
-        self.pi = {-1: {('*', '*'): {"prob": 1, "bp": 'EMPTY'}}, -2: {('EMPTY', '*'): {"prob": 0, "bp": 'EMPTY'}}}
+        self.num_of_tags = len(self.tags)
 
-    def q(self, tag1: str, tag2: str, idx: int, tag_idx: int):
-        history = History([tag1, tag2], self.words, idx)
-        result = exp(self.basicModel.log_probability(history, tag_idx))
+        self.pi = [np.array([1])]
+        # For each pair of tags holds their bp tag's index
+        self.bp = {}
+        # self.pi = {-1: {('*', '*'): {"prob": 1, "bp": 'EMPTY'}}, -2: {('EMPTY', '*'): {"prob": 0, "bp": 'EMPTY'}}}
 
-        return result
+    def q(self, tag1: str, tag2: str, word_idx: int, tag_idx: int):
+        history = History([tag1, tag2], self.words, word_idx)
+        return exp(self.basic_model.log_probability(history, tag_idx))
 
-    def _max_prob(self, idx:  int, u: str, tag_idx: int):
-        max_prob = 0
-        max_bp = ()
+    def _max_prob(self, word_idx: int):
+        self.bp[word_idx] = {}
 
-        for t in self.prev_tags[-2]:
+        if word_idx > 1:
+            Consts.TIME = 1
+            t1 = time()
+            pi_word_idx = np.zeros([self.num_of_tags, self.num_of_tags])
+            for v_idx, _ in enumerate(Consts.POS_TAGS):
+                q_per_v = []
+                for t in Consts.POS_TAGS:
+                    q_per_v_t = [self.q(t, u, word_idx-1, v_idx) for u in Consts.POS_TAGS]
+                    q_per_v.append(q_per_v_t)
 
-            cur = (self.q(t, u, idx, tag_idx) * self.pi[(idx - 1)][(t, u)]["prob"])
-            if max_prob < cur:
-                max_prob = cur
-                max_bp = t
+                q_per_v = np.array(q_per_v)
 
-        return {"prob": max_prob, "bp": max_bp}
+                # Calculates pi and bp
 
-    def _max_prob_tag_by_idx(self, idx: int, v: str)-> list:
-        res = ""
-        max_tmp = 0
-        for k in self.pi[idx].keys():
-            if k[1] != v:
-                continue
-            if self.pi[idx][k]["prob"] > max_tmp:
-                max_tmp = self.pi[idx][k]["prob"]
-                res = k[0]
+                for u_idx, u in enumerate(Consts.POS_TAGS):
+                    pi_word_idx[u_idx][v_idx] = (self.pi[word_idx - 1][:, u_idx] * q_per_v[:, u_idx]).max()
+                    self.bp[word_idx][(u, Consts.POS_TAGS[v_idx])] = (
+                            self.pi[word_idx - 1][:, u_idx] * q_per_v[:, u_idx]).argmax()
+            self.pi.append(pi_word_idx)
+            Consts.print_time("_max_prob for k = " + str(word_idx), time() - t1)
 
-        return res
-
-
+        elif word_idx == 1:
+            Consts.TIME = 1
+            t1 = time()
+            # Calculates pi and bp
+            pi_word_idx = []
+            for v_idx, _ in enumerate(Consts.POS_TAGS):
+                pi_word_idx.append(self.q('*', '*', word_idx-1, v_idx))
+            self.pi.append(np.array([pi_word_idx]))
+            Consts.print_time("_max_prob for k = 0", time() - t1)
 
     def run_viterbi(self)-> list:
-        num_words = len(self.words)
-        n = num_words - 1
-        res = []
+        n = len(self.words)
 
-        for k in range(0, num_words):
-            Consts.print_info("run_viterbi", "Tagging word '" + self.words[k] + "'")
-            if k == 0:
-                self.prev_tags[-1] = ['*']
-                self.prev_tags[-2] = ['*']
-            else:
-                self.prev_tags[-1].clear()
-                self.prev_tags[-2].clear()
-                for (u, v) in self.pi[(k - 1)].keys():
-                    if v not in self.prev_tags[-1]:
-                        self.prev_tags[-1].append(v)
-                    if u not in self.prev_tags[-2]:
-                        self.prev_tags[-2].append(u)
+        for k in range(1, n + 1):
+            Consts.print_info("run_viterbi", "Tagging word '" + self.words[k-1] + "'")
+            self._max_prob(k)
 
-            for u in self.prev_tags[-1]:
-                for j, v in enumerate(self.tags):
-                    if k not in self.pi:
-                        self.pi[k] = {}
-                    self.pi[k][(u, v)] = self._max_prob(k, u, j)
+        idx_row_of_max = (self.pi[n]).argmax()
+        key_2, key_1 = np.unravel_index(idx_row_of_max, self.pi[n].shape)
 
-        with open("utils/viterbi_pi.txt", 'w+') as f:
-            for k in range(0, n + 1):
-                f.write("**** KEY = "+str(k)+" num pairs = " + str(len(self.pi[k].keys()))+" ****")
-                f.write("\n")
-                for key in self.pi[k].keys():
-                    f.write("Key => "+str(k)+" "+str(key)+" => "+str(self.pi[k][key]))
-                    f.write("\n")
+        res = [Consts.POS_TAGS[key_2], Consts.POS_TAGS[key_1]]
 
-        max_prob_n = 0
-        key_max = ('*', '*')
-        for key in self.pi[n].keys():
-            if self.pi[n][key]["prob"] > max_prob_n:
-                max_prob_n = self.pi[n][key]["prob"]
-                key_max = key
-
-        res.append(key_max[1])
-        res.append(key_max[0])
-
-        for k in reversed(range(0, n - 1)):
-            u = res[(n - k - 2)]
-            v = res[(n - k - 1)]
-            res.append(self.pi[(k + 2)][(u, v)]["bp"])
-
-        print(res[::-1])
+        for k in reversed(range(1, n - 1)):
+            i = res[(n - k - 2)]
+            j = res[(n - k - 1)]
+            res.append(Consts.POS_TAGS[self.bp[(k + 2)][(i, j)]])
 
         return res[::-1]
