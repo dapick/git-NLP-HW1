@@ -9,7 +9,7 @@ import numpy as np
 from math import exp
 
 
-class MyTestCase(unittest.TestCase):
+class BasicModelTest(unittest.TestCase):
     # TODO: before running this test save v_parameter aside because it override it
     def test_calculate_v_for_two_sentences(self):
         basic_model = BasicModel(Consts.TRAIN, "../tests/trialDataFiles/trialTwoSentences.wtag")
