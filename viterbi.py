@@ -2,7 +2,7 @@ from basicModel import BasicModel
 from history import History
 from consts import Consts
 from math import exp
-
+from time import time
 
 class Viterbi:
     basicModel = None
@@ -16,14 +16,15 @@ class Viterbi:
 
     def q(self, tag1: str, tag2: str, idx: int, tag_idx: int):
         history = History([tag1, tag2], self.words, idx)
+        t2 = time()
         result = exp(self.basicModel.log_probability(history, tag_idx))
-
+        # Consts.print_time("q", str(time() - t2))
         return result
 
     def _max_prob(self, idx:  int, u: str, tag_idx: int):
         max_prob = 0
         max_bp = ()
-
+        t1 = time()
         for t in self.prev_tags[-2]:
             # if idx == 0:
             #    return {"prob": 1, "bp": '*'}
@@ -31,6 +32,7 @@ class Viterbi:
             if max_prob < cur:
                 max_prob = cur
                 max_bp = t
+        # Consts.print_time ("_max_prob", str(time() - t1))
         return {"prob": max_prob, "bp": max_bp}
 
     def _max_prob_tag_by_idx(self, idx: int, v: str)-> list:
@@ -72,9 +74,13 @@ class Viterbi:
                         self.pi[k] = {}
                     self.pi[k][(u, v)] = self._max_prob(k, u, j)
 
-        for k in range(0, n + 1):
-            with open("utils/viterbi_pi.txt", "w+") as f:
-                print("Key = "+str(k)+"- "+str(self.pi[k]), file=f)
+        with open("utils/viterbi_pi.txt", 'w+') as f:
+            for k in range(0, n + 1):
+                f.write("**** KEY = "+str(k)+" num pairs = " + str(len(self.pi[k].keys()))+" ****")
+                f.write("\n")
+                for key in self.pi[k].keys():
+                    f.write("Key => "+str(k)+" "+str(key)+" => "+str(self.pi[k][key]))
+                    f.write("\n")
 
         max_prob_n = 0
         key_max = ('*', '*')
@@ -85,7 +91,6 @@ class Viterbi:
 
         res.append(key_max[1])
         res.append(key_max[0])
-       # res.append(max_bp_n)
 
         for k in reversed(range(0, n - 1)):
             i = res[(n - k - 2)]
