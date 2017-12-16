@@ -44,6 +44,17 @@ class Tagger:
 
         Parsing.parse_lists_to_wtag_file(self.sentences_list, self.tags_list, self.tagged_file)
 
-    # TODO: not done
-    def calculate_percision(self, compare_file: str):
-        compare_wtag_list = Parsing.parse_wtag_file_to_lists(compare_file)
+    @staticmethod
+    def calculate_percision(out_file: str, expected_file: str):
+        out_list_w, out_list_t = Parsing.parse_wtag_file_to_lists(out_file)
+        exp_list_w, exp_list_t = Parsing.parse_wtag_file_to_lists(expected_file)
+
+        count = 0
+        for i, sen in enumerate(out_list_w):
+            for j, w in enumerate(sen):
+                if w == exp_list_w[i][j] and out_list_t[i][j] == exp_list_t[i][j]:
+                    count += 1
+        num_words = sum(len(out_list_w[k]) for k in range(0, len(out_list_w)))
+        print(num_words)
+        str_res = str(100 * count / num_words)+"%"
+        return str_res

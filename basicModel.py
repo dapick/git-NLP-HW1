@@ -26,14 +26,14 @@ class BasicModel(object):
 
     def _training(self, file_full_name: str=Consts.PATH_TO_TRAINING):
         self.v_parameter = Training(Consts.BASIC_MODEL, ["100", "103", "104"], file_full_name).v_parameter
-        with open("../data_from_training/basic_model/v_parameter", 'wb') as f:
+        with open("data_from_training/basic_model/v_parameter", 'wb') as f:
             pickle.dump(self.v_parameter, f, protocol=-1)
 
     def _set_internal_values(self):
         self.inner_sum = {}
         # with open("../data_from_training/basic_model/v_as_list", 'r') as f:
         #     self.v_parameter = np.asarray([float(line.rstrip()) for line in f.readlines()])
-        with open("../data_from_training/basic_model/v_parameter", 'rb') as f:
+        with open("data_from_training/basic_model/v_parameter", 'rb') as f:
             self.v_parameter = pickle.load(f)
         self.feature = Feature(Consts.TAG, Consts.BASIC_MODEL)
 
