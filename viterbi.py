@@ -16,23 +16,21 @@ class Viterbi:
 
     def q(self, tag1: str, tag2: str, idx: int, tag_idx: int):
         history = History([tag1, tag2], self.words, idx)
-        t2 = time()
         result = exp(self.basicModel.log_probability(history, tag_idx))
-        # Consts.print_time("q", str(time() - t2))
+
         return result
 
     def _max_prob(self, idx:  int, u: str, tag_idx: int):
         max_prob = 0
         max_bp = ()
-        t1 = time()
+
         for t in self.prev_tags[-2]:
-            # if idx == 0:
-            #    return {"prob": 1, "bp": '*'}
+
             cur = (self.q(t, u, idx, tag_idx) * self.pi[(idx - 1)][(t, u)]["prob"])
             if max_prob < cur:
                 max_prob = cur
                 max_bp = t
-        # Consts.print_time ("_max_prob", str(time() - t1))
+
         return {"prob": max_prob, "bp": max_bp}
 
     def _max_prob_tag_by_idx(self, idx: int, v: str)-> list:
@@ -93,9 +91,10 @@ class Viterbi:
         res.append(key_max[0])
 
         for k in reversed(range(0, n - 1)):
-            i = res[(n - k - 2)]
-            j = res[(n - k - 1)]
-            res.append(self.pi[(k + 2)][(i, j)]["bp"])
+            u = res[(n - k - 2)]
+            v = res[(n - k - 1)]
+            res.append(self.pi[(k + 2)][(u, v)]["bp"])
 
+        print(res[::-1])
 
         return res[::-1]
