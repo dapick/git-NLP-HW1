@@ -10,7 +10,7 @@ class TaggerTestCase(unittest.TestCase):
 
     def test_accuracy(self):
         file_tagger = Tagger("trialDataFiles/short.words")
-        file_tagger.tag()
+        # file_tagger.tag()
         file_tagger.calculate_accuracy("trialDataFiles/expectedShort.wtag", file_tagger.tagged_file)
 
 
