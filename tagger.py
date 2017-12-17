@@ -55,6 +55,5 @@ class Tagger:
                 if w == exp_list_w[i][j] and out_list_t[i][j] == exp_list_t[i][j]:
                     count += 1
         num_words = sum(len(out_list_w[k]) for k in range(0, len(out_list_w)))
-        print(num_words)
         str_res = str(100 * count / num_words) + "%"
         print("The accuracy is: " + str_res)

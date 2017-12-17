@@ -6,6 +6,7 @@ from consts import Consts
 
 from math import exp
 import numpy as np
+from scipy.sparse import coo_matrix
 
 
 class Viterbi:
@@ -18,19 +19,19 @@ class Viterbi:
         self.num_of_tags = len(self.tags)
 
         self.pi = [np.array([1])]
-        # For each pair of tags holds their bp tag's index
-        self.bp = {}  # e.g: {1: {('*', 'DT'): -1} when '*' index is -1
+        # For each pair of tags holds their bp tag's index. -2 is the idx of the tag before '*', '*'
+        self.bp = [np.array([-2], dtype='int32')]
 
     def q(self, tag1: str, tag2: str, word_idx: int, tag_idx: int):
         history = History([tag1, tag2], self.words, word_idx)
         return exp(self.basic_model.log_probability(history, tag_idx))
 
     def _max_prob(self, word_idx: int):
-        self.bp[word_idx] = {}
 
-        if word_idx > 1:
+        if word_idx >= 3:
             t1 = time()
             pi_word_idx = np.zeros([self.num_of_tags, self.num_of_tags])
+            bp_word_idx = np.zeros([self.num_of_tags, self.num_of_tags], dtype='int32')
             for v_idx, _ in enumerate(Consts.POS_TAGS):
                 q_per_v = []
                 for t in Consts.POS_TAGS:
@@ -40,11 +41,11 @@ class Viterbi:
                 q_per_v = np.array(q_per_v)
 
                 # Calculates pi and bp
-                for u_idx, u in enumerate(Consts.POS_TAGS):
-                    prod_cols = self.pi[word_idx - 1][:, u_idx] * q_per_v[:, u_idx]
-                    pi_word_idx[u_idx][v_idx] = prod_cols.max()
-                    self.bp[word_idx][(u, Consts.POS_TAGS[v_idx])] = prod_cols.argmax()
+                prod_cols = self.pi[word_idx - 1] * q_per_v
+                pi_word_idx[:, v_idx] = prod_cols.max(0)
+                bp_word_idx[:, v_idx] = prod_cols.argmax(0)
             self.pi.append(pi_word_idx)
+            self.bp.append(bp_word_idx)
             Consts.print_time("_max_prob for k = " + str(word_idx), time() - t1)
 
         elif word_idx == 1:
@@ -54,7 +55,27 @@ class Viterbi:
             for v_idx, _ in enumerate(Consts.POS_TAGS):
                 pi_word_idx.append(self.q('*', '*', word_idx-1, v_idx))
             self.pi.append(np.array([pi_word_idx]))
+            self.bp.append(np.array([-1], dtype='int32'))
             Consts.print_time("_max_prob for k = 0", time() - t1)
+
+        elif word_idx == 2:
+            t1 = time()
+            pi_word_idx = np.zeros([self.num_of_tags, self.num_of_tags])
+            bp_word_idx = np.zeros([self.num_of_tags, self.num_of_tags], dtype='int32')
+            for v_idx, _ in enumerate(Consts.POS_TAGS):
+                q_per_v = []
+                q_per_v_t = [self.q('*', u, word_idx - 1, v_idx) for u in Consts.POS_TAGS]
+                q_per_v.append(q_per_v_t)
+
+                q_per_v = np.array(q_per_v)
+
+                # Calculates pi and bp
+                prod_cols = self.pi[word_idx - 1] * q_per_v
+                pi_word_idx[:, v_idx] = prod_cols.max(0)
+                bp_word_idx[:, v_idx] = prod_cols.argmax(0)
+            self.pi.append(pi_word_idx)
+            self.bp.append(bp_word_idx)
+            Consts.print_time("_max_prob for k = " + str(word_idx), time() - t1)
 
     def run_viterbi(self)-> list:
         n = len(self.words)
@@ -67,13 +88,12 @@ class Viterbi:
         idx_row_of_max = (self.pi[n]).argmax()
         tag_idx_n_minus_1, tag_idx_n = np.unravel_index(idx_row_of_max, self.pi[n].shape)
 
-        res = [Consts.POS_TAGS[tag_idx_n], Consts.POS_TAGS[tag_idx_n_minus_1]]
+        res_idx = [tag_idx_n, tag_idx_n_minus_1]
 
-        t1 = time()
         for k in reversed(range(1, n - 1)):
-            i = res[(n - k - 2)]
-            j = res[(n - k - 1)]
-            res.append(Consts.POS_TAGS[self.bp[(k + 2)][(i, j)]])
-        Consts.print_time("Unfolding the tags", time() - t1)
+            i = res_idx[-2]
+            j = res_idx[-1]
+            res_idx.append(self.bp[k + 2][i, j])
 
+        res = [Consts.POS_TAGS[idx] for idx in res_idx]
         return res[::-1]
