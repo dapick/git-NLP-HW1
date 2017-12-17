@@ -45,7 +45,7 @@ class Tagger:
         Parsing.parse_lists_to_wtag_file(self.sentences_list, self.tags_list, self.tagged_file)
 
     @staticmethod
-    def calculate_percision(out_file: str, expected_file: str):
+    def calculate_accuracy(out_file: str, expected_file: str):
         out_list_w, out_list_t = Parsing.parse_wtag_file_to_lists(out_file)
         exp_list_w, exp_list_t = Parsing.parse_wtag_file_to_lists(expected_file)
 
@@ -56,5 +56,5 @@ class Tagger:
                     count += 1
         num_words = sum(len(out_list_w[k]) for k in range(0, len(out_list_w)))
         print(num_words)
-        str_res = str(100 * count / num_words)+"%"
-        return str_res
+        str_res = str(100 * count / num_words) + "%"
+        print("The accuracy is: " + str_res)
