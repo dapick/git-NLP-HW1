@@ -16,16 +16,12 @@ class ParseWTagsTestCase(unittest.TestCase):
     def test_parse_wtag_file_to_lists_with_two_sentences(self):
         two_sentences_file_name = "trialDataFiles/trialTwoSentences.wtag"
         sentences, tags = Parsing.parse_wtag_file_to_lists(two_sentences_file_name)
-        # expected_parsing = [[("The", "DT"), ("Treasury", "NNP"), ("is", "VBZ"), ("still", "RB"), ("working", "VBG"), ("out", "RP"), ("the", "DT"), ("details", "NNS"), ("with", "IN"), ("bank", "NN"), ("trade", "NN"), ("associations", "NNS"), ("and", "CC"), ("the", "DT"), ("other", "JJ"), ("government", "NN"), ("agencies", "NNS"), ("that", "WDT"), ("have", "VBP"), ("a", "DT"), ("hand", "NN"), ("in", "IN"), ("fighting", "VBG"), ("money", "NN"), ("laundering", "NN"), (".", ".")],
-        #                     [("Among", "IN"), ("the", "DT"), ("possibilities", "NNS"), ("the", "DT"), ("Treasury", "NNP"), ("is", "VBZ"), ("considering", "VBG"), ("are", "VBP"), ("requirements", "NNS"), ("that", "IN"), ("banks", "NNS"), ("keep", "VB"), ("records", "NNS"), ("identifying", "VBG"), ("the", "DT"), ("originators", "NNS"), ("and", "CC"), ("recipients", "NNS"), ("of", "IN"), ("international", "JJ"), ("wire", "NN"), ("transfers", "NNS"), (".", ".")]]
-        # for sentence, sentence_tags, expected_sentence in zip(sentences, tags, expected_parsing):
-        #     for word, tag, item in zip(sentence, sentence_tags, expected_sentence):
-        #         self.assertEqual(word, item[0])
-        #         self.assertEqual(tag, item[1])
-        with open("trialDataFiles/short.words", 'w') as f:
-            for sentence in sentences:
-
-                print(sentence, file=f)
+        expected_parsing = [[("The", "DT"), ("Treasury", "NNP"), ("is", "VBZ"), ("still", "RB"), ("working", "VBG"), ("out", "RP"), ("the", "DT"), ("details", "NNS"), ("with", "IN"), ("bank", "NN"), ("trade", "NN"), ("associations", "NNS"), ("and", "CC"), ("the", "DT"), ("other", "JJ"), ("government", "NN"), ("agencies", "NNS"), ("that", "WDT"), ("have", "VBP"), ("a", "DT"), ("hand", "NN"), ("in", "IN"), ("fighting", "VBG"), ("money", "NN"), ("laundering", "NN"), (".", ".")],
+                            [("Among", "IN"), ("the", "DT"), ("possibilities", "NNS"), ("the", "DT"), ("Treasury", "NNP"), ("is", "VBZ"), ("considering", "VBG"), ("are", "VBP"), ("requirements", "NNS"), ("that", "IN"), ("banks", "NNS"), ("keep", "VB"), ("records", "NNS"), ("identifying", "VBG"), ("the", "DT"), ("originators", "NNS"), ("and", "CC"), ("recipients", "NNS"), ("of", "IN"), ("international", "JJ"), ("wire", "NN"), ("transfers", "NNS"), (".", ".")]]
+        for sentence, sentence_tags, expected_sentence in zip(sentences, tags, expected_parsing):
+            for word, tag, item in zip(sentence, sentence_tags, expected_sentence):
+                self.assertEqual(word, item[0])
+                self.assertEqual(tag, item[1])
 
     def test_parse_words_file_to_list_with_one_sentence(self):
         one_sentence_file_name = "trialDataFiles/trialOneSentence.words"
@@ -80,6 +76,15 @@ class ParseWTagsTestCase(unittest.TestCase):
         with open(all_sentences_file_name) as f:
             file2_data = f.read()
         self.assertEqual(file1_data, file2_data)
+
+    def test_parse_wtag_file_to_words_file(self):
+        test_file_path = "../data/test.wtag"
+        sentences, _ = Parsing.parse_wtag_file_to_lists("trialDataFiles/trialTwoSentences.wtag")
+        with open("trialDataFiles/parsed.words", 'w+') as f:
+            for sentence in sentences:
+                for word in sentence:
+                    print(word, end=' ', file=f)
+                print(file=f)
 
 
 if __name__ == '__main__':
