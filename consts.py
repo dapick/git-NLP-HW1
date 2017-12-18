@@ -1,7 +1,7 @@
 class Consts:
-    POS_TAGS = ['VBN', 'PRP$', 'PRP', '-LRB-', 'WP', 'PDT', 'VBP', ',', 'NNPS', 'WDT', 'NN', 'EX', '``', 'VBG', 'RP',
-                'TO', 'VBZ', 'VBD', 'JJ', 'NNP', 'FW', 'NNS', 'MD', 'CC', 'DT', '$', 'WP$', 'POS', '.', 'VB', 'RB',
-                'SYM', ':', 'CD', '-RRB-', 'JJR', 'RBS', 'WRB', '#', 'JJS', 'UH', 'RBR', "''", 'IN']
+    POS_TAGS = ['*', 'VBN', 'PRP$', 'PRP', '-LRB-', 'WP', 'PDT', 'VBP', ',', 'NNPS', 'WDT', 'NN', 'EX', '``', 'VBG',
+                'RP', 'TO', 'VBZ', 'VBD', 'JJ', 'NNP', 'FW', 'NNS', 'MD', 'CC', 'DT', '$', 'WP$', 'POS', '.', 'VB',
+                'RB', 'SYM', ':', 'CD', '-RRB-', 'JJR', 'RBS', 'WRB', '#', 'JJS', 'UH', 'RBR', "''", 'IN']
 
     PREFIXES = ['a', 'anti', 'back', 'be', 'by', 'co', 'de', 'dis', 'down', 'en', 'em', 'ex', 'fore', 'hind', 'mid',
                 'midi', 'mini', 'mis', 'off', 'on', 'out', 'over', 'post', 'pre', 'pro', 're', 'self', 'step', 'twi',
@@ -12,6 +12,7 @@ class Consts:
                 'meta', 'mono', 'mon', 'mult', 'neo', 'non', 'omni', 'pan', 'para', 'ped', 'per', 'peri', 'pleo', 'pod',
                 'poly', 'post', 'pre', 'pro', 'pro', 'pros', 'pyro', 'semi', 'sub', 'sup', 'sur', 'syn', 'sy', 'syl',
                 'sym', 'tele', 'tri', 'uni', 'vice', 'gain', 'umbe', 'y']
+
     SUFFIXES = ['able', 'ac', 'adeֲ', 'age', 'al', 'an', 'ian', 'ance', 'ant', 'ar', 'ard', 'ary', 'ate', 'cide',
                 'crat', 'cule', 'cy', 'dom', 'dox', 'ed', 'ee', 'eer', 'emia', 'en', 'ence', 'ency', 'ent', 'er', 'ern',
                 'ese', 'ess', 'est', 'etic', 'ette', 'ful', 'fy', 'gam', 'gamy', 'gon', 'hood', 'ial', 'ian', 'ic',
@@ -21,7 +22,7 @@ class Consts:
                 'tomy', 'tude', 'ty', 'ular', 'uous', 'ure', 'ward', 'ware', 'wise', 'y']
 
     PATH_TO_TRAINING = "data/train.wtag"
-    PATH_TO_TEST = "data/test.exep"
+    PATH_TO_TEST = "data/test.wtag"
     PATH_TO_COMPETITION = "data/comp.words"
 
     TRAIN = "Train"
