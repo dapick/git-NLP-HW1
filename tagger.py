@@ -1,13 +1,13 @@
 from consts import Consts
-from time import time
-from viterbi2 import Viterbi
+from viterbi import Viterbi
 from parsing import Parsing
 from basicModel import BasicModel
 from history import Histories
 
+from multiprocessing.pool import Pool
+
 
 class Tagger:
-
     # input file
     word_file = None
     sentences_list = None
@@ -21,11 +21,12 @@ class Tagger:
 
     basic_model = None
 
-    def __init__(self, word_file: str=Consts.PATH_TO_COMPETITION):
+    def __init__(self, word_file: str):
         self.word_file = word_file
         self.sentences_list = Parsing.parse_words_file_to_list(self.word_file)
         self.basic_model = BasicModel(Consts.TAG)
         self.tags_per_word = Histories.build_history_tag_per_word_lists("../data/train.wtag")
+
         self.tagged_file = self._get_tagged_file_name()
         self.tags_list = []
 
@@ -34,18 +35,21 @@ class Tagger:
         return ret_file.replace("words", "wtag")
 
     def _tag_sentence(self, sen: list):
-        t1 = time()
-        self.viterbi = Viterbi(sen, self.tags_per_word)
-        tags = self.viterbi.run_viterbi()
-        self.tags_list.append(tags)
-        Consts.print_info("sentence_tagger", str(time() - t1) + " to tagging sentence " + str(sen))
+        self.viterbi = Viterbi(sen, self.basic_model)
+        return self.viterbi.run_viterbi()
 
     def tag(self):
         Consts.print_info("tag_file", "Tagging file " + self.word_file)
-        for sen in self.sentences_list:
-            self._tag_sentence(sen)
 
-        Parsing.parse_lists_to_wtag_file(self.sentences_list, self.tags_list, self.tagged_file)
+        # Run parallel - good when checking many sentences
+        with Pool(6) as pool:
+            sentences_tags = pool.map(self._tag_sentence, self.sentences_list)
+
+        # Run linear - good when checking a few sentences
+        # for sen in self.sentences_list:
+        #     self._tag_sentence(sen)
+
+        Parsing.parse_lists_to_wtag_file(self.sentences_list, list(sentences_tags), self.tagged_file)
 
     @staticmethod
     def calculate_accuracy(out_file: str, expected_file: str):
