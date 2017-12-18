@@ -15,6 +15,7 @@ class Feature(object):
     feature_vector = None
     # List of: in place 'feature_idx' there is the occurrence_number
     features_occurrences = None
+
     # Dict of {(h, t): list of features applies}
     history_tag_features = None
     # Dict of {h: list of tags applies}
@@ -55,7 +56,7 @@ class Feature(object):
             with open("../data_from_training/basic_model/internal_values_of_feature", 'rb') as f:
                 self.feature_vector, self.used_features = pickle.load(f)
         elif model == Consts.ADVANCED_MODEL:
-            with open("data_from_training/basic_model/internal_values_of_feature", 'rb') as f:
+            with open("data_from_training/advanced_model/internal_values_of_feature", 'rb') as f:
                 self.feature_vector, self.used_features = pickle.load(f)
 
     # Gives an index for each feature
@@ -71,23 +72,29 @@ class Feature(object):
     def feature_100(self):
         Consts.print_info("feature_100", "Building")
         for history, tag in zip(self.histories, self.tags):
-            self.feature_structure(("100", (history.get_current_word().lower(), tag)))
+            self.feature_structure(("100", (history.get_current_word(), tag)))
 
     def feature_101(self):
-        Consts.print_info("feature_101", "Building")
         for history, tag in zip(self.histories, self.tags):
-            current_word = history.get_current_word().lower()
-            for suffix in Consts.SUFFIXES:
-                if current_word.endswith(suffix):
-                    self.feature_structure(("101", (suffix, tag)))
+            self.feature_structure(("101", (history.word_custom_suffix(1), tag)))
+            current_word_len = len(history.get_current_word())
+            if current_word_len >= 2:
+                self.feature_structure(("101", (history.word_custom_suffix(2), tag)))
+            if current_word_len >= 3:
+                self.feature_structure(("101", (history.word_custom_suffix(3), tag)))
+            if current_word_len >= 4:
+                self.feature_structure(("101", (history.word_custom_suffix(4), tag)))
 
     def feature_102(self):
-        Consts.print_info("feature_102", "Building")
         for history, tag in zip(self.histories, self.tags):
-            current_word = history.get_current_word().lower()
-            for prefix in Consts.PREFIXES:
-                if current_word.startswith(prefix):
-                    self.feature_structure(("102", (prefix, tag)))
+            self.feature_structure(("102", (history.word_custom_prefix(1), tag)))
+            current_word_len = len(history.get_current_word())
+            if current_word_len >= 2:
+                self.feature_structure(("102", (history.word_custom_prefix(2), tag)))
+            if current_word_len >= 3:
+                self.feature_structure(("102", (history.word_custom_prefix(3), tag)))
+            if current_word_len >= 4:
+                self.feature_structure(("102", (history.word_custom_prefix(4), tag)))
 
     def feature_103(self):
         Consts.print_info("feature_103", "Building")
@@ -126,20 +133,25 @@ class Feature(object):
     # Calculates a list of features' idx which apply on a certain pair: (h, t)
     def history_matched_features(self, history: History, tag: str):
         history_features_idxs = []
-        current_word = history.get_current_word().lower()
+        current_word = history.get_current_word()
+        current_word_len = len(current_word)
         # Feature_100
         if "100" in self.used_features:
             self.insert_idx(("100", (current_word, tag)), history_features_idxs)
-        # Feature_101
-        if "101" in self.used_features:
-            for suffix in Consts.SUFFIXES:
-                if current_word.endswith(suffix):
-                    self.insert_idx(("101", (suffix, tag)), history_features_idxs)
-        # Feature_102
-        if "102" in self.used_features:
-            for prefix in Consts.PREFIXES:
-                if current_word.startswith(prefix):
-                    self.insert_idx(("102", (prefix, tag)), history_features_idxs)
+        # Feature_101 + Feature_102
+        if "101" in self.used_features and "102" in self.used_features:
+            self.insert_idx(("101", (history.word_custom_suffix(1), tag)), history_features_idxs)
+            self.insert_idx(("102", (history.word_custom_prefix(1), tag)), history_features_idxs)
+            if current_word_len >= 2:
+                self.insert_idx(("101", (history.word_custom_suffix(2), tag)), history_features_idxs)
+                self.insert_idx(("102", (history.word_custom_prefix(2), tag)), history_features_idxs)
+            if current_word_len >= 3:
+                self.insert_idx(("101", (history.word_custom_suffix(3), tag)), history_features_idxs)
+                self.insert_idx(("102", (history.word_custom_prefix(3), tag)), history_features_idxs)
+            if current_word_len >= 4:
+                self.insert_idx(("101", (history.word_custom_suffix(4), tag)), history_features_idxs)
+                self.insert_idx(("102", (history.word_custom_prefix(4), tag)), history_features_idxs)
+
         # Feature 103
         if "103" in self.used_features:
             self.insert_idx(("103", (history.tags[0], history.tags[1], tag)),
