@@ -13,6 +13,30 @@ class History(object):
         self.sentence = sentence
         self.current_word_idx = current_word_idx
 
+    def get_current_word(self) -> str:
+        return self.sentence[self.current_word_idx]
+
+    # Returns the current word idx first letters
+    def word_custom_prefix(self, idx: int) -> str:
+        return self.sentence[self.current_word_idx][:idx]
+
+    # Returns the current word idx last letters
+    def word_custom_suffix(self, idx: int) -> str:
+        return self.sentence[self.current_word_idx][-idx:]
+
+
+class TaggedHistory(object):
+    tags = None
+    sentence = None
+    current_word_idx = None
+    tag_idx = None
+
+    def __init__(self, tags: list, sentence: list, current_word_idx: int, tag_idx: int):
+        self.tags = tags
+        self.tag_idx = tag_idx
+        self.sentence = sentence
+        self.current_word_idx = current_word_idx
+
     def get_current_word(self):
         return self.sentence[self.current_word_idx]
 
@@ -52,5 +76,3 @@ class Histories(object):
                     history_tag_per_word[w_lower].append(t)
 
         return history_tag_per_word
-
-
