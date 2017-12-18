@@ -15,7 +15,7 @@ class Training(object):
 
     v_parameter = None
     # TODO: find which lambda should we use
-    lambda_value = 2
+    lambda_value = None
 
     # Common values between iterations
 
@@ -28,12 +28,13 @@ class Training(object):
     # Dict of: {(h,t): Calculates e^(v*f(h, t)/sum t in T:(e^(v*f(h, t)) for every (h, t)
     histories_sum = None
 
-    def __init__(self, model: str, used_features: list, file_full_name: str=Consts.PATH_TO_TRAINING):
+    def __init__(self, model: str, used_features: list, lambda_value: float, file_full_name: str=Consts.PATH_TO_TRAINING):
         self.feature = Feature(Consts.TRAIN, model, used_features, file_full_name)
         self.features_amount = len(self.feature.features_occurrences)
         self.features_occurrences_ndarray = np.asarray(self.feature.features_occurrences)
         self.exp_per_history_tag = {}
         self.inner_sum = {}
+        self.lambda_value = lambda_value
         self.v_parameter = self._calculate_v_parameter()
 
     def _calculate_v_parameter(self):
