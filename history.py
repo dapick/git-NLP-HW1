@@ -38,3 +38,19 @@ class Histories(object):
                             History(["*", sentence_tags[idx-1]], sentence, idx))
                 histories_tags.append(tag)
         return histories, histories_tags
+
+    @staticmethod
+    def build_history_tag_per_word_lists(file_full_name: str=Consts.PATH_TO_TRAINING):
+        sentences, tags = Parsing.parse_wtag_file_to_lists(file_full_name)
+        history_tag_per_word = {}
+        for sen, tag in zip(sentences, tags):
+            for w, t in zip(sen, tag):
+                w_lower = w.lower()
+                if w_lower not in history_tag_per_word:
+                    history_tag_per_word[w_lower] = []
+                if t not in history_tag_per_word[w_lower]:
+                    history_tag_per_word[w_lower].append(t)
+
+        return history_tag_per_word
+
+

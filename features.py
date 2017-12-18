@@ -52,7 +52,7 @@ class Feature(object):
     def _set_internal_values(self, model: str):
         self.history_tag_features = {}
         if model == Consts.BASIC_MODEL:
-            with open("data_from_training/basic_model/internal_values_of_feature", 'rb') as f:
+            with open("../data_from_training/basic_model/internal_values_of_feature", 'rb') as f:
                 self.feature_vector, self.used_features = pickle.load(f)
         elif model == Consts.ADVANCED_MODEL:
             with open("data_from_training/basic_model/internal_values_of_feature", 'rb') as f:

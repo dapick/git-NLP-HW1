@@ -1,3 +1,5 @@
+from time import time
+
 from features import Feature
 from history import History
 from consts import Consts
@@ -33,7 +35,7 @@ class BasicModel(object):
         self.inner_sum = {}
         # with open("../data_from_training/basic_model/v_as_list", 'r') as f:
         #     self.v_parameter = np.asarray([float(line.rstrip()) for line in f.readlines()])
-        with open("data_from_training/basic_model/v_parameter", 'rb') as f:
+        with open("../data_from_training/basic_model/v_parameter", 'rb') as f:
             self.v_parameter = pickle.load(f)
         self.feature = Feature(Consts.TAG, Consts.BASIC_MODEL)
 
@@ -45,12 +47,14 @@ class BasicModel(object):
 
     # Calculates the sum: sum(exp(v*f(h, t)))
     def _calculate_inner_sum(self, history: History) -> float:
+        t1 = time()
         inner_sum = self.inner_sum.get(history)
         if inner_sum is None:
             features_on_history = [self._get_applied_features(history, tag) for tag in Consts.POS_TAGS]
             inner_sum = np.asarray(
                 [sum(self.v_parameter[features_idxs]) for features_idxs in features_on_history])
             self.inner_sum[history] = inner_sum
+
         return sum(np.exp(inner_sum))
 
     # Calculates log(p(y|x;v))
