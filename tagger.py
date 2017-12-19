@@ -33,20 +33,22 @@ class Tagger:
 
     def _get_tagged_file_name(self):
         ret_file = self.word_file
-        return ret_file.replace("words", "wtag")
+        ret_file = ret_file.replace("words", "wtag")
+        ret_file = ret_file.replace("/", "/output_")
+        return ret_file
 
     def _tag_sentence(self, sentence_tuple: tuple):
-        Consts.TIME = 1
+        # Consts.TIME = 1
         sentence_idx, sentence = sentence_tuple
-        t1 = time()
+        # t1 = time()
         self.viterbi = Viterbi(sentence, self.basic_model)
         tags = self.viterbi.run_viterbi()
         # TODO: add 1 to the sentence index
-        Consts.print_time("Tagging sentence " + str(sentence_idx), time() - t1)
+        # Consts.print_time("Tagging sentence " + str(sentence_idx), time() - t1)
         return tags
 
     def tag(self):
-        Consts.print_info("tag_file", "Tagging file " + self.word_file)
+        # Consts.print_info("tag_file", "Tagging file " + self.word_file)
 
         # Run parallel - good when checking many sentences
         with Pool(6) as pool:
