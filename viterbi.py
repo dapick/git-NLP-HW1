@@ -9,10 +9,10 @@ from scipy.sparse import coo_matrix
 
 
 class Viterbi:
-    basic_model = None
+    model = None
 
-    def __init__(self, words: list, basic_model: BasicModel):
-        self.basic_model = basic_model
+    def __init__(self, words: list, model):
+        self.model = model
         self.words = words
         self.n = len(self.words)
         self.num_of_tags = len(Consts.POS_TAGS)
@@ -31,14 +31,14 @@ class Viterbi:
         cols = []
         for history_idx, history in enumerate(histories):
             tag = Consts.POS_TAGS[history.tag_idx]
-            list_idxs = self.basic_model.feature.history_matched_features(history, tag)
+            list_idxs = self.model.feature.history_matched_features(history, tag)
             len_list_idx = len(list_idxs)
             data += [1] * len_list_idx
             rows += [history_idx] * len_list_idx
             cols += list_idxs
         features_matrix = coo_matrix((data, (rows, cols)),
-                                     shape=(len(Consts.POS_TAGS) ** 3, len(self.basic_model.v_parameter))).tocsr()
-        inner_sum = np.exp(features_matrix.dot(self.basic_model.v_parameter)).reshape(([len(Consts.POS_TAGS)] * 3))
+                                     shape=(len(Consts.POS_TAGS) ** 3, len(self.model.v_parameter))).tocsr()
+        inner_sum = np.exp(features_matrix.dot(self.model.v_parameter)).reshape(([len(Consts.POS_TAGS)] * 3))
         denominator = np.sum(inner_sum, axis=-1)
         return inner_sum / denominator
 

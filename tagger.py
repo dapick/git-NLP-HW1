@@ -3,7 +3,7 @@ from viterbi import Viterbi
 from parsing import Parsing
 from basicModel import BasicModel
 from history import Histories
-
+from advancedModel import AdvancedModel
 from multiprocessing.pool import Pool
 from time import time
 
@@ -20,12 +20,16 @@ class Tagger:
     # tagger
     viterbi = None
 
-    basic_model = None
+    model = None
 
-    def __init__(self, word_file: str):
+    def __init__(self, word_file: str, model: str):
+        self.model_type = model
         self.word_file = word_file
         self.sentences_list = Parsing.parse_words_file_to_list(self.word_file)
-        self.basic_model = BasicModel(Consts.TAG)
+        if model == Consts.BASIC_MODEL:
+            self.model = BasicModel(Consts.TAG)
+        elif model == Consts.ADVANCED_MODEL:
+            self.model = AdvancedModel(Consts.TAG)
         self.tags_per_word = Histories.build_history_tag_per_word_lists("../data/train.wtag")
 
         self.tagged_file = self._get_tagged_file_name()
@@ -34,14 +38,19 @@ class Tagger:
     def _get_tagged_file_name(self):
         ret_file = self.word_file
         ret_file = ret_file.replace("words", "wtag")
-        ret_file = ret_file.replace("/", "/output_")
+        file_name = ret_file.split('.')
+        if self.model_type == Consts.BASIC_MODEL:
+            ret_file = file_name[0] + "_m1_"
+        elif self.model_type == Consts.ADVANCED_MODEL:
+            ret_file = file_name[0] + "_m2_"
+        ret_file = ret_file + "302988217." + file_name[1]
         return ret_file
 
     def _tag_sentence(self, sentence_tuple: tuple):
         # Consts.TIME = 1
         sentence_idx, sentence = sentence_tuple
         # t1 = time()
-        self.viterbi = Viterbi(sentence, self.basic_model)
+        self.viterbi = Viterbi(sentence, self.model)
         tags = self.viterbi.run_viterbi()
         # TODO: add 1 to the sentence index
         # Consts.print_time("Tagging sentence " + str(sentence_idx), time() - t1)
