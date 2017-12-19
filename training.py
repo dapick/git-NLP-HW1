@@ -40,8 +40,10 @@ class Training(object):
     def _calculate_v_parameter(self):
         Consts.print_info("minimize", "Computing v_parameter")
         # For seeing the whole process of LBFGS add '"disp": True' to the 'options' dict
+        t1 = time()
         optimize_result = minimize(fun=self._L, x0=np.zeros(self.features_amount),
                                    jac=self._gradient, method="L-BFGS-B", options={"maxiter": 400})
+        Consts.print_time("_calculate_v_parameter", time() - t1)
         return optimize_result.x
 
     # Calculate v sum in the idx where the feature applies for the pair: (h, t)
@@ -67,7 +69,7 @@ class Training(object):
         return sum(np.square(v_parameter))
 
     def _L(self, v_parameter) -> float:
-        # Consts.print_info("_L", "Calculating")
+        Consts.print_info("_L", "Calculating")
         Consts.TIME = 1
         t1 = time()
         left_sum = sum(v_parameter * self.features_occurrences_ndarray)
