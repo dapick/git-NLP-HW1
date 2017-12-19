@@ -13,12 +13,14 @@ class Consts:
                 'poly', 'post', 'pre', 'pro', 'pro', 'pros', 'pyro', 'semi', 'sub', 'sup', 'sur', 'syn', 'sy', 'syl',
                 'sym', 'tele', 'tri', 'uni', 'vice', 'gain', 'umbe', 'y']
 
-    SUFFIXES = ['able', 'ac', 'adeֲ', 'age', 'al', 'an', 'ian', 'ance', 'ant', 'ar', 'ard', 'ary', 'ate', 'cide',
-                'crat', 'cule', 'cy', 'dom', 'dox', 'ed', 'ee', 'eer', 'emia', 'en', 'ence', 'ency', 'ent', 'er', 'ern',
-                'ese', 'ess', 'est', 'etic', 'ette', 'ful', 'fy', 'gam', 'gamy', 'gon', 'hood', 'ial', 'ian', 'ic',
-                'ical', 'ile', 'ily', 'ine', 'ing', 'ion', 'ious', 'ish', 'ism', 'ist', 'ite', 'itis', 'ity', 'ive',
+    SUFFIXES = ['able', 'ac', 'adeֲ', 'age', 'al', 'an', 'ain', 'ance', 'ant', 'ar', 'ard', 'ary', 'ate', 'cide',
+                'crat', 'cule', 'cy', 'dom', 'd', 'dox', 'ed', 'ee', 'eer', 'emia', 'en', 'ence', 'ency', 'ent', 'er', 'ern',
+                'es', 'ese', 'ess', 'est', 'etic', 'ette', 'ful', 'fy', 'gam', 'gamy', 'gon', 'hood', 'ial', 'ian',
+                'ic',
+                'ical', 'ied', 'ies', 'ile', 'ily', 'ine', 'ing', 'ion', 'ious', 'ish', 'ism', 'ist', 'ite', 'itis',
+                'ity', 'ive',
                 'ize', 'less', 'let', 'like', 'ling', 'log', 'ly', 'ment', 'ness', 'oid', 'oma', 'onym', 'opia', 'opsy',
-                'or', 'ory', 'osis', 'ous', 'path', 'pnea', 'sect', 'ship', 'sion', 'some', 'th', 'tion', 'tome',
+                'or', 'ory', 'osis', 'ous', 'path', 'pnea', 's', 'sect', 'ship', 'sion', 'some', 'th', 'tion', 'tome',
                 'tomy', 'tude', 'ty', 'ular', 'uous', 'ure', 'ward', 'ware', 'wise', 'y']
 
     PATH_TO_TRAINING = "data/train.wtag"
