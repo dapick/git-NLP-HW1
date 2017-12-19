@@ -95,7 +95,8 @@ class Tagger:
         with open("../data_from_training/basic_model/10_worst_tags", "w+") as f:
             for x in list_max_wrong_tags:
                 print(x[0] + " => " + str(sorted(x[1]["dict"].items(), key=lambda x: x[0])) + "\n" + x[0] + " => " + str(x[1]["sum_wrong"]), file=f)
-                print(x[0] + " => " + str(confused_tags_with_sen[x[0]]), file=f)
+                for tup in confused_tags_with_sen[x[0]]:
+                    print(x[0] + " => " + str(tup), file=f)
 
 
 
