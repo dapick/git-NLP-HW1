@@ -62,34 +62,47 @@ class Tagger:
         Consts.print_time("tag", time() - t1)
 
 
-    @staticmethod
-    def calculate_accuracy(out_file: str, expected_file: str):
-        out_list_w, out_list_t = Parsing.parse_wtag_file_to_lists(out_file)
+    def calculate_accuracy(self, out_file: str, expected_file: str):
+        out_list_w, out_ = Parsing.parse_wtag_file_to_lists(out_file)
         exp_list_w, exp_list_t = Parsing.parse_wtag_file_to_lists(expected_file)
 
         confused_tags = {}
         for tag in Consts.POS_TAGS:
-            confused_tags[tag] = {}
+            confused_tags[tag] = {"dict": {}, "sum_wrong": 0}
 
         count = 0
         for sen_idx, sen in enumerate(out_list_w):
             for word_idx, w in enumerate(sen):
-                if w == exp_list_w[sen_idx][word_idx] and out_list_t[sen_idx][word_idx] == exp_list_t[sen_idx][word_idx]:
-                    count += 1
-                if out_list_t[sen_idx][word_idx] not in confused_tags[exp_list_t[sen_idx][word_idx]]:
-                    confused_tags[exp_list_t[sen_idx][word_idx]][out_list_t[sen_idx][word_idx]] = 1
+                exp_tag = exp_list_t[sen_idx][word_idx]
+                out_tag = out_[sen_idx][word_idx]
+                if out_tag not in confused_tags[exp_tag]["dict"]:
+                    confused_tags[exp_tag]["dict"][out_tag] = 1
                 else:
-                    confused_tags[exp_list_t[sen_idx][word_idx]][out_list_t[sen_idx][word_idx]] += 1
+                    confused_tags[exp_tag]["dict"][out_tag] += 1
+                if w == exp_list_w[sen_idx][word_idx] and out_tag == exp_tag:
+                    count += 1
+                else:
+                    confused_tags[exp_tag]["sum_wrong"] += 1
 
         with open("../data_from_training/basic_model/confusion_matrix", "w+") as f:
             for key, value in confused_tags.items():
-                print(key + "=> " + str(value), file=f)
+                print(key + " => " + str(value["dict"]) + "\n" + key + " => " + str(value["sum_wrong"]), file=f)
 
-
+        list_max_wrong_tags = sorted(confused_tags.items(), key=lambda x: x[1]["sum_wrong"], reverse=True)[:10]
+        with open("../data_from_training/basic_model/10_worst_tags", "w+") as f:
+            for x in list_max_wrong_tags:
+                print(x[0] + " => " + str(x[1]["dict"]) + "\n" + x[0] + " => " + str(x[1]["sum_wrong"]), file=f)
+                # print(x, file=f)
 
 
         num_words = sum(len(out_list_w[k]) for k in range(0, len(out_list_w)))
         str_res = str(100 * count / num_words) + "%"
         print("The accuracy is: " + str_res)
+
+
+
+
+
+
 
 
