@@ -3,10 +3,6 @@ import unittest
 from consts import Consts
 from basicModel import BasicModel
 from features import Feature
-from history import History
-
-import numpy as np
-from math import exp
 
 
 class BasicModelTest(unittest.TestCase):

@@ -76,25 +76,29 @@ class Feature(object):
 
     def feature_101(self):
         for history, tag in zip(self.histories, self.tags):
-            self.feature_structure(("101", (history.word_custom_suffix(1), tag)))
+            if history.word_custom_suffix(1) in Consts.SUFFIXES:
+                self.feature_structure(("101", (history.word_custom_suffix(1), tag)))
             current_word_len = len(history.get_current_word())
-            if current_word_len >= 2:
+            if current_word_len >= 2 and history.word_custom_suffix(2) in Consts.SUFFIXES:
                 self.feature_structure(("101", (history.word_custom_suffix(2), tag)))
-            if current_word_len >= 3:
+            if current_word_len >= 3 and history.word_custom_suffix(3) in Consts.SUFFIXES:
                 self.feature_structure(("101", (history.word_custom_suffix(3), tag)))
-            if current_word_len >= 4:
+            if current_word_len >= 4 and history.word_custom_suffix(4) in Consts.SUFFIXES:
                 self.feature_structure(("101", (history.word_custom_suffix(4), tag)))
+
 
     def feature_102(self):
         for history, tag in zip(self.histories, self.tags):
-            self.feature_structure(("102", (history.word_custom_prefix(1), tag)))
+            if history.word_custom_prefix(1) in Consts.PREFIXES:
+                self.feature_structure(("101", (history.word_custom_prefix(1), tag)))
             current_word_len = len(history.get_current_word())
-            if current_word_len >= 2:
-                self.feature_structure(("102", (history.word_custom_prefix(2), tag)))
-            if current_word_len >= 3:
-                self.feature_structure(("102", (history.word_custom_prefix(3), tag)))
-            if current_word_len >= 4:
-                self.feature_structure(("102", (history.word_custom_prefix(4), tag)))
+            if current_word_len >= 2 and history.word_custom_prefix(2) in Consts.PREFIXES:
+                self.feature_structure(("101", (history.word_custom_prefix(2), tag)))
+            if current_word_len >= 3 and history.word_custom_prefix(3) in Consts.PREFIXES:
+                self.feature_structure(("101", (history.word_custom_prefix(3), tag)))
+            if current_word_len >= 4 and history.word_custom_prefix(4) in Consts.PREFIXES:
+                self.feature_structure(("101", (history.word_custom_prefix(4), tag)))
+
 
     def feature_103(self):
         Consts.print_info("feature_103", "Building")
