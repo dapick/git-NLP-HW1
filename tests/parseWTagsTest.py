@@ -79,11 +79,14 @@ class ParseWTagsTestCase(unittest.TestCase):
 
     def test_parse_wtag_file_to_words_file(self):
         test_file_path = "../data/test.wtag"
-        sentences, _ = Parsing.parse_wtag_file_to_lists("trialDataFiles/trialTwoSentences.wtag")
+        sentences, _ = Parsing.parse_wtag_file_to_lists(test_file_path)
         with open("trialDataFiles/parsed.words", 'w+') as f:
             for sentence in sentences:
                 for word in sentence:
-                    print(word, end=' ', file=f)
+                    if word != sentence[-1]:
+                        print(word, end=' ', file=f)
+                    else:
+                        print(word, end='', file=f)
                 print(file=f)
 
 
