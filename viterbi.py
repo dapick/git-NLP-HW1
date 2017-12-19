@@ -52,8 +52,10 @@ class Viterbi:
             q = self.q(word_idx-1)
             for u_idx in range(self.num_of_tags):
                 for v_idx in range(self.num_of_tags):
-                    pi_word_idx[u_idx, v_idx] = np.max(np.multiply(self.pi[word_idx - 1][:, u_idx], q[:, u_idx, v_idx]))
-                    bp_word_idx[u_idx, v_idx] = np.argmax(np.multiply(self.pi[word_idx - 1][:, u_idx], q[:, u_idx, v_idx]))
+                    # TODO: tagging words with '*' somehow.
+                    if v_idx != 0:
+                        pi_word_idx[u_idx, v_idx] = np.max(np.multiply(self.pi[word_idx - 1][:, u_idx], q[:, u_idx, v_idx]))
+                        bp_word_idx[u_idx, v_idx] = np.argmax(np.multiply(self.pi[word_idx - 1][:, u_idx], q[:, u_idx, v_idx]))
             self.pi.append(pi_word_idx)
             self.bp.append(bp_word_idx)
             # Consts.print_time("Tagging word '" + self.words[word_idx - 1] + "', time() - t1)
