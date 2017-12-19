@@ -8,13 +8,13 @@ from tagger import Tagger
 
 class TestTrainAndTag(unittest.TestCase):
     def test_basic_model_training_and_tagging(self):
-        basic_model = BasicModel(Consts.TRAIN, "../" + Consts.PATH_TO_TRAINING)
-        with open('../data_from_training/basic_model/v_as_list', 'w+') as f:
-            for derivative in basic_model.v_parameter:
-                print(derivative, file=f)
+        # basic_model = BasicModel(Consts.TRAIN, "../" + Consts.PATH_TO_TRAINING)
+        # with open('../data_from_training/basic_model/v_as_list', 'w+') as f:
+        #     for derivative in basic_model.v_parameter:
+        #         print(derivative, file=f)
         test_words_path = "../data/test.words"
         file_tagger = Tagger(test_words_path)
-        file_tagger.tag()
+        # file_tagger.tag()
         file_tagger.calculate_accuracy("../data/output_test.wtag", "../data/test.wtag")
 
     def test_advanced_model_training_and_tagging(self):

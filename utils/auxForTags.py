@@ -18,11 +18,11 @@ class Aux:
     @property
     def unique_suffixes_and_prefixes(self):
         with open("prefix.txt") as p:
-            prefixes = [line.rstrip() for line in p.readlines()]
+            prefixes = [line.rstrip().lower() for line in p.readlines()]
 
 
         with open("suffix.txt") as s:
-            suffixes = [line.rstrip() for line in s.readlines()]
+            suffixes = [line.rstrip().lower() for line in s.readlines()]
 
         print(suffixes)
         print(prefixes)
