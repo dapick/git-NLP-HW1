@@ -81,13 +81,16 @@ class ParseWTagsTestCase(unittest.TestCase):
         test_file_path = "../data/test.wtag"
         sentences, _ = Parsing.parse_wtag_file_to_lists(test_file_path)
         with open("trialDataFiles/parsed.words", 'w+') as f:
-            for sentence in sentences:
-                for word in sentence:
-                    if word != sentence[-1]:
+            len_file = len(sentences)
+            for sentence_idx, sentence in enumerate(sentences):
+                len_sentence = len(sentence)
+                for word_idx, word in enumerate(sentence):
+                    if word_idx < len_sentence - 1:
                         print(word, end=' ', file=f)
                     else:
                         print(word, end='', file=f)
-                print(file=f)
+                if sentence_idx < len_file - 1:
+                    print(file=f)
 
 
 if __name__ == '__main__':
