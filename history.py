@@ -16,13 +16,13 @@ class History(object):
     def get_current_word(self) -> str:
         return self.sentence[self.current_word_idx]
 
-    # Returns the current word idx first letters
+    # Returns the current word idx first letters and lower case
     def word_custom_prefix(self, idx: int) -> str:
-        return self.sentence[self.current_word_idx][:idx]
+        return self.sentence[self.current_word_idx][:idx].lower()
 
-    # Returns the current word idx last letters
+    # Returns the current word idx last letters and lower case
     def word_custom_suffix(self, idx: int) -> str:
-        return self.sentence[self.current_word_idx][-idx:]
+        return self.sentence[self.current_word_idx][-idx:].lower()
 
 
 class TaggedHistory(object):
