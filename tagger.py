@@ -49,7 +49,7 @@ class Tagger:
 
     def tag(self):
         Consts.print_info("tag_file", "Tagging file " + self.word_file)
-
+        t1 = time()
         # Run parallel - good when checking many sentences
         with Pool(6) as pool:
             sentences_tags = pool.map(self._tag_sentence, enumerate(self.sentences_list))
@@ -59,17 +59,37 @@ class Tagger:
         #     self._tag_sentence(sen)
 
         Parsing.parse_lists_to_wtag_file(self.sentences_list, list(sentences_tags), self.tagged_file)
+        Consts.print_time("tag", time() - t1)
+
 
     @staticmethod
     def calculate_accuracy(out_file: str, expected_file: str):
         out_list_w, out_list_t = Parsing.parse_wtag_file_to_lists(out_file)
         exp_list_w, exp_list_t = Parsing.parse_wtag_file_to_lists(expected_file)
 
+        confused_tags = {}
+        for tag in Consts.POS_TAGS:
+            confused_tags[tag] = {}
+
         count = 0
-        for i, sen in enumerate(out_list_w):
-            for j, w in enumerate(sen):
-                if w == exp_list_w[i][j] and out_list_t[i][j] == exp_list_t[i][j]:
+        for sen_idx, sen in enumerate(out_list_w):
+            for word_idx, w in enumerate(sen):
+                if w == exp_list_w[sen_idx][word_idx] and out_list_t[sen_idx][word_idx] == exp_list_t[sen_idx][word_idx]:
                     count += 1
+                if out_list_t[sen_idx][word_idx] not in confused_tags[exp_list_t[sen_idx][word_idx]]:
+                    confused_tags[exp_list_t[sen_idx][word_idx]][out_list_t[sen_idx][word_idx]] = 1
+                else:
+                    confused_tags[exp_list_t[sen_idx][word_idx]][out_list_t[sen_idx][word_idx]] += 1
+
+        with open("../data_from_training/basic_model/confusion_matrix", "w+") as f:
+            for key, value in confused_tags.items():
+                print(key + "=> " + str(value), file=f)
+
+
+
+
         num_words = sum(len(out_list_w[k]) for k in range(0, len(out_list_w)))
         str_res = str(100 * count / num_words) + "%"
         print("The accuracy is: " + str_res)
+
+
