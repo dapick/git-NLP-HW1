@@ -1,6 +1,7 @@
 from history import History, Histories
 from consts import Consts
 
+from time import time
 import pickle
 
 
@@ -40,6 +41,7 @@ class Feature(object):
         for feature_type in used_features:
             self.features_funcs[feature_type]()
 
+        # TODO: move this function down to the 'advanced_model' section
         with open('../data_from_training/advanced_model/feature_vector', 'w+') as f:
             for key, values in self.feature_vector.items():
                 print(str(key) + " => " + str(values), file=f)
@@ -179,6 +181,7 @@ class Feature(object):
         return history_features_idxs
 
     def _calculate_history_tag_features(self):
+        t1 = time()
         Consts.print_info("_calculate_history_tag_features", "Preprocessing")
         self.history_tag_features = {}
         history_tag_list = [(history, tag) for history in self.histories for tag in Consts.POS_TAGS]
@@ -191,6 +194,7 @@ class Feature(object):
                 # Saves the (h,t) in the dict 'history_tag_features' only if they apply to some feature
                 self.history_tag_features[(history, tag)] = history_features_idxs
                 self.tags_per_history[history].append(tag)
+        Consts.print_time("_calculate_history_tag_features", time() - t1)
 
     def count_features_types(self):
         for feature_type in self.used_features:
