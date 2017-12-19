@@ -51,7 +51,7 @@ class Tagger:
         Consts.print_info("tag_file", "Tagging file " + self.word_file)
         t1 = time()
         # Run parallel - good when checking many sentences
-        with Pool(6) as pool:
+        with Pool(2) as pool:
             sentences_tags = pool.map(self._tag_sentence, enumerate(self.sentences_list))
 
         # Run linear - good when checking a few sentences
@@ -67,8 +67,10 @@ class Tagger:
         exp_list_w, exp_list_t = Parsing.parse_wtag_file_to_lists(expected_file)
 
         confused_tags = {}
+        confused_tags_with_sen = {}
         for tag in Consts.POS_TAGS:
             confused_tags[tag] = {"dict": {}, "sum_wrong": 0}
+            confused_tags_with_sen[tag] = []
 
         count = 0
         for sen_idx, sen in enumerate(out_list_w):
@@ -82,6 +84,7 @@ class Tagger:
                 if w == exp_list_w[sen_idx][word_idx] and out_tag == exp_tag:
                     count += 1
                 else:
+                    confused_tags_with_sen[exp_tag].append({out_tag: (sen, (word_idx + 1), w)})
                     confused_tags[exp_tag]["sum_wrong"] += 1
 
         with open("../data_from_training/basic_model/confusion_matrix", "w+") as f:
@@ -91,8 +94,10 @@ class Tagger:
         list_max_wrong_tags = sorted(confused_tags.items(), key=lambda x: x[1]["sum_wrong"], reverse=True)[:10]
         with open("../data_from_training/basic_model/10_worst_tags", "w+") as f:
             for x in list_max_wrong_tags:
-                print(x[0] + " => " + str(x[1]["dict"]) + "\n" + x[0] + " => " + str(x[1]["sum_wrong"]), file=f)
-                # print(x, file=f)
+                print(x[0] + " => " + str(sorted(x[1]["dict"].items(), key=lambda x: x[0])) + "\n" + x[0] + " => " + str(x[1]["sum_wrong"]), file=f)
+                print(x[0] + " => " + str(confused_tags_with_sen[x[0]]), file=f)
+
+
 
 
         num_words = sum(len(out_list_w[k]) for k in range(0, len(out_list_w)))
