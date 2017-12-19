@@ -43,10 +43,10 @@ class Viterbi:
         return inner_sum / denominator
 
     def run_viterbi(self) -> list:
-        Consts.TIME = 1
+        # Consts.TIME = 1
 
         for word_idx in range(1, self.n + 1):
-            t1 = time()
+            # t1 = time()
             pi_word_idx = np.zeros((self.num_of_tags, self.num_of_tags))
             bp_word_idx = np.zeros((self.num_of_tags, self.num_of_tags), dtype='int32')
             q = self.q(word_idx-1)
@@ -56,7 +56,7 @@ class Viterbi:
                     bp_word_idx[u_idx, v_idx] = np.argmax(np.multiply(self.pi[word_idx - 1][:, u_idx], q[:, u_idx, v_idx]))
             self.pi.append(pi_word_idx)
             self.bp.append(bp_word_idx)
-            Consts.print_time("Tagging word '" + self.words[word_idx - 1] + "' took:", time() - t1)
+            # Consts.print_time("Tagging word '" + self.words[word_idx - 1] + "', time() - t1)
 
         idx_row_of_max = np.argmax(self.pi[self.n])
         tag_idx_n_minus_1, tag_idx_n = np.unravel_index(idx_row_of_max, self.pi[self.n].shape)

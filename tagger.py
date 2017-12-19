@@ -5,6 +5,7 @@ from basicModel import BasicModel
 from history import Histories
 
 from multiprocessing.pool import Pool
+from time import time
 
 
 class Tagger:
@@ -34,16 +35,22 @@ class Tagger:
         ret_file = self.word_file
         return ret_file.replace("words", "wtag")
 
-    def _tag_sentence(self, sen: list):
-        self.viterbi = Viterbi(sen, self.basic_model)
-        return self.viterbi.run_viterbi()
+    def _tag_sentence(self, sentence_tuple: tuple):
+        Consts.TIME = 1
+        sentence_idx, sentence = sentence_tuple
+        t1 = time()
+        self.viterbi = Viterbi(sentence, self.basic_model)
+        tags = self.viterbi.run_viterbi()
+        # TODO: add 1 to the sentence index
+        Consts.print_time("Tagging sentence " + str(sentence_idx), time() - t1)
+        return tags
 
     def tag(self):
         Consts.print_info("tag_file", "Tagging file " + self.word_file)
 
         # Run parallel - good when checking many sentences
         with Pool(6) as pool:
-            sentences_tags = pool.map(self._tag_sentence, self.sentences_list)
+            sentences_tags = pool.map(self._tag_sentence, enumerate(self.sentences_list))
 
         # Run linear - good when checking a few sentences
         # for sen in self.sentences_list:
