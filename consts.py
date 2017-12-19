@@ -5,10 +5,10 @@ class Consts:
 
     PREFIXES = ['a', 'anti', 'back', 'be', 'by', 'co', 'de', 'dis', 'down', 'en', 'em', 'ex', 'fore', 'hind', 'mid',
                 'midi', 'mini', 'mis', 'off', 'on', 'out', 'over', 'post', 'pre', 'pro', 're', 'self', 'step', 'twi',
-                'un', 'up', 'with', 'a', 'Afro', 'ambi', 'an', 'ana', 'ante', 'anti', 'apo', 'ap', 'arch', 'auto', 'bi',
+                'un', 'up', 'with', 'a', 'afro', 'ambi', 'an', 'ana', 'ante', 'anti', 'apo', 'ap', 'arch', 'auto', 'bi',
                 'bio', 'cis', 'con', 'co', 'com', 'col', 'cor', 'cryo', 'de', 'demi', 'demo', 'di', 'dia', 'dis', 'di',
-                'dif', 'du', 'duo', 'eco', 'en', 'el', 'em', 'epi', 'ep', 'Euro', 'ex', 'geo', 'gyro', 'hemi', 'homo',
-                'hypo', 'ideo', 'idio', 'in', 'Indo', 'in', 'il', 'im', 'ir', 'iso', 'macr', 'mal', 'maxi', 'mega',
+                'dif', 'du', 'duo', 'eco', 'en', 'el', 'em', 'epi', 'ep', 'euro', 'ex', 'geo', 'gyro', 'hemi', 'homo',
+                'hypo', 'ideo', 'idio', 'in', 'indo', 'in', 'il', 'im', 'ir', 'iso', 'macr', 'mal', 'maxi', 'mega',
                 'meta', 'mono', 'mon', 'mult', 'neo', 'non', 'omni', 'pan', 'para', 'ped', 'per', 'peri', 'pleo', 'pod',
                 'poly', 'post', 'pre', 'pro', 'pro', 'pros', 'pyro', 'semi', 'sub', 'sup', 'sur', 'syn', 'sy', 'syl',
                 'sym', 'tele', 'tri', 'uni', 'vice', 'gain', 'umbe', 'y']
