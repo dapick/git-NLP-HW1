@@ -40,10 +40,17 @@ class Feature(object):
         for feature_type in used_features:
             self.features_funcs[feature_type]()
 
+        with open('../data_from_training/advanced_model/feature_vector', 'w+') as f:
+            for key, values in self.feature_vector.items():
+                print(str(key) + " => " + str(values), file=f)
+
         # Creates 'history_tag_features'
         self._calculate_history_tag_features()
 
         if model == Consts.BASIC_MODEL:
+            with open('../data_from_training/basic_model/feature_vector', 'w+') as f:
+                for key, values in self.feature_vector.items():
+                    print(str(key) + " => " + str(values), file=f)
             with open("../data_from_training/basic_model/internal_values_of_feature", 'wb') as f:
                 pickle.dump([self.feature_vector, self.used_features], f, protocol=-1)
         elif model == Consts.ADVANCED_MODEL:
@@ -75,6 +82,7 @@ class Feature(object):
             self.feature_structure(("100", (history.get_current_word(), tag)))
 
     def feature_101(self):
+        Consts.print_info("feature_101", "Building")
         for history, tag in zip(self.histories, self.tags):
             if history.word_custom_suffix(1) in Consts.SUFFIXES:
                 self.feature_structure(("101", (history.word_custom_suffix(1), tag)))
@@ -88,16 +96,17 @@ class Feature(object):
 
 
     def feature_102(self):
+        Consts.print_info("feature_102", "Building")
         for history, tag in zip(self.histories, self.tags):
             if history.word_custom_prefix(1) in Consts.PREFIXES:
-                self.feature_structure(("101", (history.word_custom_prefix(1), tag)))
+                self.feature_structure(("102", (history.word_custom_prefix(1), tag)))
             current_word_len = len(history.get_current_word())
             if current_word_len >= 2 and history.word_custom_prefix(2) in Consts.PREFIXES:
-                self.feature_structure(("101", (history.word_custom_prefix(2), tag)))
+                self.feature_structure(("102", (history.word_custom_prefix(2), tag)))
             if current_word_len >= 3 and history.word_custom_prefix(3) in Consts.PREFIXES:
-                self.feature_structure(("101", (history.word_custom_prefix(3), tag)))
+                self.feature_structure(("102", (history.word_custom_prefix(3), tag)))
             if current_word_len >= 4 and history.word_custom_prefix(4) in Consts.PREFIXES:
-                self.feature_structure(("101", (history.word_custom_prefix(4), tag)))
+                self.feature_structure(("102", (history.word_custom_prefix(4), tag)))
 
 
     def feature_103(self):
