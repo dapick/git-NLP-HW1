@@ -1,4 +1,3 @@
-from basicModel import BasicModel
 from history import TaggedHistory
 from consts import Consts
 
