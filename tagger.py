@@ -3,7 +3,6 @@ from viterbi import Viterbi
 from parsing import Parsing
 from basicModel import BasicModel
 from advancedModel import AdvancedModel
-from history import Histories
 
 from multiprocessing.pool import Pool
 from time import time
@@ -31,7 +30,6 @@ class Tagger:
             self.model = BasicModel(Consts.TAG)
         elif model == Consts.ADVANCED_MODEL:
             self.model = AdvancedModel(Consts.TAG)
-        self.tags_per_word = Histories.build_history_tag_per_word_lists("../data/train.wtag")
 
         self.tagged_file = self._get_tagged_file_name()
         self.tags_list = []
@@ -70,8 +68,8 @@ class Tagger:
         Parsing.parse_lists_to_wtag_file(self.sentences_list, list(sentences_tags), self.tagged_file)
         Consts.print_time("Tagging file", time() - t1)
 
-
-    def calculate_accuracy(self, out_file: str, expected_file: str):
+    @staticmethod
+    def calculate_accuracy(out_file: str, expected_file: str):
         out_list_w, out_ = Parsing.parse_wtag_file_to_lists(out_file)
         exp_list_w, exp_list_t = Parsing.parse_wtag_file_to_lists(expected_file)
 
