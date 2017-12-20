@@ -3,6 +3,14 @@ class Consts:
                 'MD', 'NN', 'NNP', 'NNPS', 'NNS', 'PDT', 'POS', 'PRP', 'PRP$', 'RB', 'RBR', 'RBS', 'RP', 'SYM', 'TO',
                 'UH', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'WDT', 'WP', 'WP$', 'WRB', '``']
 
+    DICT_POS_TAGS = {'*': 0, '#': 1, '$': 2, "''": 3, ',': 4, '-LRB-': 5, '-RRB-': 6, '.': 7, ':': 8, 'CC': 9, 'CD': 10,
+                     'DT': 11, 'EX': 12, 'FW': 13, 'IN': 14, 'JJ': 15, 'JJR': 16, 'JJS': 17, 'MD': 18, 'NN': 19,
+                     'NNP': 20, 'NNPS': 21, 'NNS': 22, 'PDT': 23, 'POS': 24, 'PRP': 25, 'PRP$': 26, 'RB': 27, 'RBR': 28,
+                     'RBS': 29, 'RP': 30, 'SYM': 31, 'TO': 32, 'UH': 33, 'VB': 34, 'VBD': 35, 'VBG': 36, 'VBN': 37,
+                     'VBP': 38, 'VBZ': 39, 'WDT': 40, 'WP': 41, 'WP$': 42, 'WRB': 43, '``': 44}
+
+    TAGS_AMOUNT = 45
+
     SUFFIXES = ['a', 'ac', 'ad', 'ade', 'age', 'al', 'all', 'an', 'ana', 'ane', 'ant', 'ar', 'ard', 'art', 'ary', 'ase',
                 'ate', 'b', 'bot', 'c', 'cy', 'd', 'dom', 'e', 'ean', 'ed', 'ee', 'eer', 'ein', 'eme', 'en', 'ene',
                 'ent', 'er', 'es', 'ese', 'ess', 'est', 'et', 'eth', 'ey', 'fer', 'fic', 'ful', 'fy', 'g', 'gen', 'gon',

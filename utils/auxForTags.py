@@ -5,15 +5,15 @@ from parsing import Parsing
 class Aux:
 
     @property
-    def unique_tags_from_train_file(self):
-        tags = set()
-        tag_file = "../" + Consts.PATH_TO_TRAINING
-        with open(tag_file, 'r') as f:
-            for line in f:
-                for word in line.split():
-                    _, t = word.split("_")
-                    tags.add(t)
-        return sorted(tags)
+    def unique_tags_from_train_file(self) -> dict:
+        tags_from_train = Parsing.parse_wtag_file_to_tags("../" + Consts.PATH_TO_TRAINING)
+        idx = 1
+        tags_dict = {}
+        for tag in tags_from_train:
+            if tag not in tags_dict:
+                tags_dict[tag] = idx
+                idx += 1
+        return tags_dict
 
     @property
     def unique_suffixes_and_prefixes(self):
