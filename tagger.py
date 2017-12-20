@@ -2,8 +2,9 @@ from consts import Consts
 from viterbi import Viterbi
 from parsing import Parsing
 from basicModel import BasicModel
-from history import Histories
 from advancedModel import AdvancedModel
+from history import Histories
+
 from multiprocessing.pool import Pool
 from time import time
 
@@ -37,13 +38,12 @@ class Tagger:
 
     def _get_tagged_file_name(self):
         ret_file = self.word_file
-        ret_file = ret_file.replace("words", "wtag")
-        file_name = ret_file.split('.')
+        file_name = ret_file.split('.words')
         if self.model_type == Consts.BASIC_MODEL:
             ret_file = file_name[0] + "_m1_"
         elif self.model_type == Consts.ADVANCED_MODEL:
             ret_file = file_name[0] + "_m2_"
-        ret_file = ret_file + "302988217." + file_name[1]
+        ret_file = ret_file + "302988217.wtag"
         return ret_file
 
     def _tag_sentence(self, sentence_tuple: tuple):
@@ -60,7 +60,7 @@ class Tagger:
         Consts.print_info("tag_file", "Tagging file " + self.word_file)
         t1 = time()
         # Run parallel - good when checking many sentences
-        with Pool(2) as pool:
+        with Pool(6) as pool:
             sentences_tags = pool.map(self._tag_sentence, enumerate(self.sentences_list))
 
         # Run linear - good when checking a few sentences
@@ -68,7 +68,7 @@ class Tagger:
         #     self._tag_sentence(sen)
 
         Parsing.parse_lists_to_wtag_file(self.sentences_list, list(sentences_tags), self.tagged_file)
-        Consts.print_time("tag", time() - t1)
+        Consts.print_time("Tagging file", time() - t1)
 
 
     def calculate_accuracy(self, out_file: str, expected_file: str):
@@ -107,17 +107,6 @@ class Tagger:
                 for tup in confused_tags_with_sen[x[0]]:
                     print(x[0] + " => " + str(tup), file=f)
 
-
-
-
         num_words = sum(len(out_list_w[k]) for k in range(0, len(out_list_w)))
         str_res = str(100 * count / num_words) + "%"
         print("The accuracy is: " + str_res)
-
-
-
-
-
-
-
-
