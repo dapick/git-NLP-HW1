@@ -1,5 +1,6 @@
 from history import TaggedHistory
 from consts import Consts
+from model import Model
 
 from time import time
 import numpy as np
@@ -10,7 +11,7 @@ from scipy.sparse import coo_matrix
 class Viterbi:
     model = None
 
-    def __init__(self, words: list, model):
+    def __init__(self, words: list, model: Model):
         self.model = model
         self.words = words
         self.n = len(self.words)

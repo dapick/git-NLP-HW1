@@ -1,9 +1,8 @@
 from consts import Consts
 from viterbi import Viterbi
 from parsing import Parsing
-from basicModel import BasicModel
-from advancedModel import AdvancedModel
 
+from model import BasicModel, AdvancedModel
 from multiprocessing.pool import Pool
 from time import time
 

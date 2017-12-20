@@ -24,7 +24,8 @@ class Consts:
                 'tomy', 'tude', 'ty', 'ular', 'uous', 'ure', 'ward', 'ware', 'wise', 'y']
 
     PATH_TO_TRAINING = "data/train.wtag"
-    PATH_TO_TEST = "data/test.wtag"
+    PATH_TO_TEST_WTAG = "data/test.wtag"
+    PATH_TO_TEST_WORDS = "data/test.words"
     PATH_TO_COMPETITION = "data/comp.words"
 
     TRAIN = "Train"

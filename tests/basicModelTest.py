@@ -1,7 +1,7 @@
 import unittest
 
 from consts import Consts
-from basicModel import BasicModel
+from model import BasicModel
 from features import Feature
 
 
