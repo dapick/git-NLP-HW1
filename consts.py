@@ -29,8 +29,8 @@ class Consts:
     PATH_TO_COMPETITION = "data/comp.words"
 
     TRAIN = "Train"
-    BASIC_MODEL = "basic_model model"
-    ADVANCED_MODEL = "advanced model"
+    BASIC_MODEL = "basic_model"
+    ADVANCED_MODEL = "advanced_model"
 
     TAG = "Tag"
 

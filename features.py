@@ -44,29 +44,17 @@ class Feature(object):
         # Creates 'history_tag_features'
         self._calculate_history_tag_features()
 
-        if model == Consts.BASIC_MODEL:
-            with open('../data_from_training/basic_model/feature_vector', 'w+') as f:
-                for key, values in self.feature_vector.items():
-                    print(str(key) + " => " + str(values), file=f)
-            with open("../data_from_training/basic_model/internal_values_of_feature", 'wb') as f:
-                pickle.dump([self.feature_vector, self.used_features], f, protocol=-1)
-
-        elif model == Consts.ADVANCED_MODEL:
-            with open('../data_from_training/advanced_model/feature_vector', 'w+') as f:
-                for key, values in self.feature_vector.items():
-                    print(str(key) + " => " + str(values), file=f)
-            with open("../data_from_training/advanced_model/internal_values_of_feature", 'wb') as f:
-                pickle.dump([self.feature_vector, self.used_features], f, protocol=-1)
+        with open('../data_from_training/' + model + '/feature_vector', 'w+') as f:
+            for key, values in self.feature_vector.items():
+                print(str(key) + " => " + str(values), file=f)
+        with open("../data_from_training/" + model + "/internal_values_of_feature", 'wb') as f:
+            pickle.dump([self.feature_vector, self.used_features], f, protocol=-1)
 
     def _set_internal_values(self, model: str):
         self.history_tag_features = {}
-        if model == Consts.BASIC_MODEL:
-            with open("../data_from_training/basic_model/internal_values_of_feature", 'rb') as f:
-                self.feature_vector, self.used_features = pickle.load(f)
 
-        elif model == Consts.ADVANCED_MODEL:
-            with open("../data_from_training/advanced_model/internal_values_of_feature", 'rb') as f:
-                self.feature_vector, self.used_features = pickle.load(f)
+        with open("../data_from_training/" + model + "/internal_values_of_feature", 'rb') as f:
+            self.feature_vector, self.used_features = pickle.load(f)
 
     # Gives an index for each feature
     def feature_structure(self, keys: tuple):

@@ -23,6 +23,7 @@ class Tagger:
 
     def __init__(self, word_file: str, model: str):
         self.model_type = model
+
         self.word_file = word_file
         self.sentences_list = Parsing.parse_words_file_to_list(self.word_file)
         if model == Consts.BASIC_MODEL:
@@ -67,8 +68,7 @@ class Tagger:
         Parsing.parse_lists_to_wtag_file(self.sentences_list, list(sentences_tags), self.tagged_file)
         Consts.print_time("Tagging file", time() - t1)
 
-    @staticmethod
-    def calculate_accuracy(out_file: str, expected_file: str):
+    def calculate_accuracy(self, out_file: str, expected_file: str):
         out_list_w, out_ = Parsing.parse_wtag_file_to_lists(out_file)
         exp_list_w, exp_list_t = Parsing.parse_wtag_file_to_lists(expected_file)
 
@@ -93,12 +93,12 @@ class Tagger:
                     confused_tags_with_sen[exp_tag].append({out_tag: (sen, (word_idx + 1), w)})
                     confused_tags[exp_tag]["sum_wrong"] += 1
 
-        with open("../data_from_training/basic_model/confusion_matrix", "w+") as f:
+        with open("../data_from_training/" + self.model_type + "/confusion_matrix", "w+") as f:
             for key, value in confused_tags.items():
                 print(key + " => " + str(value["dict"]) + "\n" + key + " => " + str(value["sum_wrong"]), file=f)
 
         list_max_wrong_tags = sorted(confused_tags.items(), key=lambda x: x[1]["sum_wrong"], reverse=True)[:10]
-        with open("../data_from_training/basic_model/10_worst_tags", "w+") as f:
+        with open("../data_from_training/" + self.model_type + "/10_worst_tags", "w+") as f:
             for x in list_max_wrong_tags:
                 print(x[0] + " => " + str(sorted(x[1]["dict"].items(), key=lambda x: x[0])) + "\n" + x[0] + " => " + str(x[1]["sum_wrong"]), file=f)
                 for tup in confused_tags_with_sen[x[0]]:
