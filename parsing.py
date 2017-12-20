@@ -16,6 +16,20 @@ class Parsing(object):
             tags.append([word_tag[1].rstrip() for word_tag in sliced_sentence])
         return sentences, tags
 
+    @staticmethod
+    def parse_wtag_file_to_tags(file_full_name: str) -> list:
+        with open(file_full_name, 'r') as f:
+            lines = f.readlines()
+
+        tags = set()
+        # For each line, creates a list of word_POS
+        raw_sentences = [line.split(' ') for line in lines]
+        for sentence in raw_sentences:
+            # For each word, creates a list of [word, POS]
+            sliced_sentence = [word_tag.split('_') for word_tag in sentence]
+            tags |= {word_tag[1].rstrip() for word_tag in sliced_sentence}
+        return sorted(tags)
+
     def parse_wtag_file_to_words_file(self, wtag_file_full_name: str):
         sentences, _ = self.parse_wtag_file_to_lists(wtag_file_full_name)
         words_file_full_name = wtag_file_full_name.replace("wtag", "words")
