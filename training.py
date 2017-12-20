@@ -35,6 +35,8 @@ class Training(object):
         self.exp_per_history_tag = {}
         self.inner_sum = {}
         self.lambda_value = lambda_value
+        self.iterate_number = 0
+        self.time_started_LBFGS = 0
         self.v_parameter = self._calculate_v_parameter()
 
     def _calculate_v_parameter(self):
@@ -68,31 +70,32 @@ class Training(object):
 
     def _L(self, v_parameter) -> float:
         # Consts.print_info("_L", "Calculating")
-        Consts.TIME = 1
-        t1 = time()
-        left_sum = sum(v_parameter * self.features_occurrences_ndarray)
-        # Consts.print_time("left_sum", time() - t1)
+        self.time_started_LBFGS = time()
 
-        t1 = time()
+        left_sum = sum(v_parameter * self.features_occurrences_ndarray)
+
         for history in self.feature.histories:
             self.inner_sum[history] = self._calculate_inner_sum(v_parameter, history)
-        # Consts.print_time("inner_right_sum", time() - t1)
         right_sum = sum(np.log(list(self.inner_sum.values())))
 
         return -(left_sum - right_sum - (self.lambda_value/2) * self._v_squares(v_parameter))
 
     def _gradient(self, v_parameter):
         # Consts.print_info("_gradient", "Calculating")
-        Consts.TIME = 1
+        # t1 = time()
+
         self.histories_sum = np.zeros(self.features_amount)
-        t1 = time()
         for history in self.feature.histories:
             inner_sum = self.inner_sum[history]
             for tag in self.feature.tags_per_history[history]:
                 exp_per_history_tag = self.exp_per_history_tag[(history, tag)]
                 for feature_idx in self.feature.history_tag_features[(history, tag)]:
                     self.histories_sum[feature_idx] += exp_per_history_tag / inner_sum
-        # Consts.print_time("histories_sum", time() - t1)
 
         gradient = self.features_occurrences_ndarray - self.histories_sum - (self.lambda_value * v_parameter)
+
+        Consts.TIME = 1
+        Consts.print_time("Iterate number " + str(self.iterate_number), time() - self.time_started_LBFGS)
+        self.iterate_number += 1
+
         return gradient*(-1)
