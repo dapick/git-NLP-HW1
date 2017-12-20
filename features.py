@@ -30,7 +30,8 @@ class Feature(object):
 
     def _training(self, model: str, used_features: list, file_full_name: str=Consts.PATH_TO_TRAINING):
         self.features_funcs = {"100": self.feature_100, "101": self.feature_101, "102": self.feature_102,
-                               "103": self.feature_103, "104": self.feature_104, "105": self.feature_105}
+                               "103": self.feature_103, "104": self.feature_104, "105": self.feature_105,
+                               "capital_letter": self.feature_capital_letter, "hyphen_word": self.feature_hyphen_word}
         self.histories, self.tags = \
             Histories.build_history_list_and_tags_list(file_full_name)
         self.used_features = used_features
@@ -112,6 +113,18 @@ class Feature(object):
         for tag in self.tags:
             self.feature_structure(("105", tag))
 
+    def feature_capital_letter(self):
+        Consts.print_info("feature_capital_letter", "Building")
+        for history, tag in zip(self.histories, self.tags):
+            if history.get_current_word()[0].isupper():
+                self.feature_structure(("capital_letter", tag))
+
+    def feature_hyphen_word(self):
+        Consts.print_info("feature_hyphen_word", "Building")
+        for history, tag in zip(self.histories, self.tags):
+            if '-' in history.get_current_word():
+                self.feature_structure(("hyphen_word", tag))
+
     def _reduce_features(self):
         Consts.print_info("_reduce_features", "Reducing")
         self.idx = 0
@@ -164,9 +177,17 @@ class Feature(object):
         if "105" in self.used_features:
             self.insert_idx(("105", tag), history_features_idxs)
 
+        # Feature capital_letter
+        if "capital_letter" in self.used_features:
+            self.insert_idx(("capital_letter", tag), history_features_idxs)
+        # Feature hyphen_word
+        if "hyphen_word" in self.used_features:
+            self.insert_idx(("hyphen_word", tag), history_features_idxs)
+
         return history_features_idxs
 
     def _calculate_history_tag_features(self):
+        Consts.TIME = 1
         t1 = time()
         Consts.print_info("_calculate_history_tag_features", "Preprocessing")
         self.history_tag_features = {}

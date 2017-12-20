@@ -108,6 +108,6 @@ class Tagger:
                 for tup in confused_tags_with_sen[x[0]]:
                     print(x[0] + " => " + str(tup), file=f)
 
-        num_words = sum(len(out_list_w[k]) for k in range(0, len(out_list_w)))
+        num_words = sum(len(out_list_w[k]) for k in range(len(out_list_w)))
         str_res = str(100 * count / num_words) + "%"
         print("The accuracy is: " + str_res)
