@@ -24,8 +24,6 @@ class BasicModel(object):
 
     def _set_internal_values(self):
         self.inner_sum = {}
-        # with open("../data_from_training/basic_model/v_as_list", 'r') as f:
-        #     self.v_parameter = np.asarray([float(line.rstrip()) for line in f.readlines()])
         with open("../data_from_training/basic_model/v_parameter", 'rb') as f:
             self.v_parameter = pickle.load(f)
         self.feature = Feature(Consts.TAG, Consts.BASIC_MODEL)

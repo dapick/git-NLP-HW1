@@ -41,11 +41,6 @@ class Feature(object):
         for feature_type in used_features:
             self.features_funcs[feature_type]()
 
-        # TODO: move this function down to the 'advanced_model' section
-        with open('../data_from_training/advanced_model/feature_vector', 'w+') as f:
-            for key, values in self.feature_vector.items():
-                print(str(key) + " => " + str(values), file=f)
-
         # Creates 'history_tag_features'
         self._calculate_history_tag_features()
 
@@ -55,7 +50,11 @@ class Feature(object):
                     print(str(key) + " => " + str(values), file=f)
             with open("../data_from_training/basic_model/internal_values_of_feature", 'wb') as f:
                 pickle.dump([self.feature_vector, self.used_features], f, protocol=-1)
+
         elif model == Consts.ADVANCED_MODEL:
+            with open('../data_from_training/advanced_model/feature_vector', 'w+') as f:
+                for key, values in self.feature_vector.items():
+                    print(str(key) + " => " + str(values), file=f)
             with open("../data_from_training/advanced_model/internal_values_of_feature", 'wb') as f:
                 pickle.dump([self.feature_vector, self.used_features], f, protocol=-1)
 
@@ -64,8 +63,9 @@ class Feature(object):
         if model == Consts.BASIC_MODEL:
             with open("../data_from_training/basic_model/internal_values_of_feature", 'rb') as f:
                 self.feature_vector, self.used_features = pickle.load(f)
+
         elif model == Consts.ADVANCED_MODEL:
-            with open("data_from_training/advanced_model/internal_values_of_feature", 'rb') as f:
+            with open("../data_from_training/advanced_model/internal_values_of_feature", 'rb') as f:
                 self.feature_vector, self.used_features = pickle.load(f)
 
     # Gives an index for each feature
@@ -96,7 +96,6 @@ class Feature(object):
             if current_word_len >= 4 and history.word_custom_suffix(4) in Consts.SUFFIXES:
                 self.feature_structure(("101", (history.word_custom_suffix(4), tag)))
 
-
     def feature_102(self):
         Consts.print_info("feature_102", "Building")
         for history, tag in zip(self.histories, self.tags):
@@ -109,7 +108,6 @@ class Feature(object):
                 self.feature_structure(("102", (history.word_custom_prefix(3), tag)))
             if current_word_len >= 4 and history.word_custom_prefix(4) in Consts.PREFIXES:
                 self.feature_structure(("102", (history.word_custom_prefix(4), tag)))
-
 
     def feature_103(self):
         Consts.print_info("feature_103", "Building")

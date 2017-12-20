@@ -25,7 +25,7 @@ class TestTrainAndTag(unittest.TestCase):
         test_words_path = "../data/test.words"
         file_tagger = Tagger(test_words_path)
         file_tagger.tag()
-        file_tagger.calculate_accuracy("../data/output_test.wtag", "../data/test.wtag")
+        file_tagger.calculate_accuracy(file_tagger.tagged_file, "../data/test.wtag")
 
 
 if __name__ == '__main__':
