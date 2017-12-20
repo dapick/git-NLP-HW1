@@ -36,7 +36,6 @@ class BasicModel(Model):
             pickle.dump(self.v_parameter, f, protocol=-1)
 
     def _set_internal_values(self):
-        self.inner_sum = {}
         with open("../data_from_training/" + Consts.BASIC_MODEL + "/v_parameter", 'rb') as f:
             self.v_parameter = pickle.load(f)
         self.feature = Feature(Consts.TAG, Consts.BASIC_MODEL)
