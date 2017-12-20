@@ -3,6 +3,7 @@ from consts import Consts
 
 from time import time
 import pickle
+from scipy.sparse import coo_matrix
 
 
 class Feature(object):
@@ -20,6 +21,7 @@ class Feature(object):
     # Dict of {(h, t): list of features applies}
     history_tag_features = None
     all_possible_tagged_histories = None
+    features_matrix = None
 
     def __init__(self, method: str, model: str, used_features: list=None, file_full_name: str=None):
         if method == Consts.TRAIN:
@@ -42,11 +44,12 @@ class Feature(object):
         for feature_type in used_features:
             self.features_funcs[feature_type]()
 
+        self.features_amount = len(self.features_occurrences)
         self._calculate_all_possible_tagged_histories()
         self.len_all_possible_tagged_histories = len(self.all_possible_tagged_histories)
 
-        # Creates 'history_tag_features'
         self._calculate_history_tag_features()
+        self._calculate_features_matrix()
 
         with open('../data_from_training/' + model + '/feature_vector', 'w+') as f:
             for key, values in self.feature_vector.items():
@@ -199,6 +202,24 @@ class Feature(object):
                     TaggedHistory(history.tags, history.sentence, history.current_word_idx,
                                   tag_idx))
         Consts.print_time("_calculate_all_possible_tagged_histories", time() - t1)
+
+    def _calculate_features_matrix(self):
+        Consts.TIME = 1
+        t1 = time()
+        Consts.print_info("_calculate_features_matrix", "Preprocessing")
+        data = []
+        rows = []
+        cols = []
+        for history_idx, tagged_history in enumerate(self.all_possible_tagged_histories):
+            list_idxs = self.history_tag_features[tagged_history]
+            len_list_idx = len(list_idxs)
+            data += [1] * len_list_idx
+            rows += [history_idx] * len_list_idx
+            cols += list_idxs
+
+        self.features_matrix = coo_matrix((data, (rows, cols)),
+                                          shape=(self.len_all_possible_tagged_histories, self.features_amount)).tocsr()
+        Consts.print_time("_calculate_features_matrix", time() - t1)
 
     def _calculate_history_tag_features(self):
         Consts.TIME = 1
