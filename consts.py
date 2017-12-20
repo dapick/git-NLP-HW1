@@ -3,25 +3,32 @@ class Consts:
                 'RP', 'TO', 'VBZ', 'VBD', 'JJ', 'NNP', 'FW', 'NNS', 'MD', 'CC', 'DT', '$', 'WP$', 'POS', '.', 'VB',
                 'RB', 'SYM', ':', 'CD', '-RRB-', 'JJR', 'RBS', 'WRB', '#', 'JJS', 'UH', 'RBR', "''", 'IN']
 
-    PREFIXES = ['a', 'anti', 'back', 'be', 'by', 'co', 'de', 'dis', 'down', 'en', 'em', 'ex', 'fore', 'hind', 'mid',
-                'midi', 'mini', 'mis', 'off', 'on', 'out', 'over', 'post', 'pre', 'pro', 're', 'self', 'step', 'twi',
-                'un', 'up', 'with', 'a', 'afro', 'ambi', 'an', 'ana', 'ante', 'anti', 'apo', 'ap', 'arch', 'auto', 'bi',
-                'bio', 'cis', 'con', 'co', 'com', 'col', 'cor', 'cryo', 'de', 'demi', 'demo', 'di', 'dia', 'dis', 'di',
-                'dif', 'du', 'duo', 'eco', 'en', 'el', 'em', 'epi', 'ep', 'euro', 'ex', 'geo', 'gyro', 'hemi', 'homo',
-                'hypo', 'ideo', 'idio', 'in', 'indo', 'in', 'il', 'im', 'ir', 'iso', 'macr', 'mal', 'maxi', 'mega',
-                'meta', 'mono', 'mon', 'mult', 'neo', 'non', 'omni', 'pan', 'para', 'ped', 'per', 'peri', 'pleo', 'pod',
-                'poly', 'post', 'pre', 'pro', 'pro', 'pros', 'pyro', 'semi', 'sub', 'sup', 'sur', 'syn', 'sy', 'syl',
-                'sym', 'tele', 'tri', 'uni', 'vice', 'gain', 'umbe', 'y']
+    PREFIXES = ['a', 'ab', 'abs', 'ac', 'acr', 'acro', 'acti', 'ad', 'aer', 'aero', 'af', 'afte', 'ag', 'agr', 'agri',
+                'agro', 'al', 'allo', 'ambi', 'an', 'ana', 'and', 'andr', 'angl', 'ano', 'ant', 'anth', 'anti', 'ap',
+                'apo', 'aqui', 'arc', 'arch', 'aris', 'arit', 'arth', 'at', 'atto', 'audi', 'aut', 'auto', 'bact',
+                'bar', 'baro', 'bath', 'be', 'bi', 'bibl', 'bin', 'bio', 'blas', 'brac', 'brad', 'by', 'carb', 'card',
+                'carp', 'cel', 'cen', 'cent', 'chal', 'chem', 'chin', 'chir', 'chlo', 'chol', 'chri', 'chro', 'chry',
+                'circ', 'co', 'col', 'com', 'con', 'cont', 'cor', 'cosm', 'coun', 'cycl', 'cyn', 'de', 'dec', 'deca',
+                'deci', 'demi', 'deut', 'di', 'dia', 'dini', 'dipl', 'dis', 'down', 'dys', 'eco', 'elec', 'em', 'en',
+                'end', 'endo', 'ent', 'epi', 'equi', 'ethn', 'eu', 'eur', 'euro', 'ever', 'ex', 'exa', 'exo', 'extr',
+                'ferr', 'fluo', 'for', 'fore', 'fort', 'fran', 'ful', 'full', 'gain', 'gen', 'geo', 'gymn', 'half',
+                'heli', 'hem', 'hemi', 'hemo', 'hend', 'hist', 'hol', 'home', 'hydr', 'hype', 'hypo', 'il', 'ill', 'im',
+                'in', 'ind', 'indo', 'inte', 'intr', 'ir', 'is', 'iso', 'ital', 'ker', 'kilo', 'like', 'lip', 'lipo',
+                'macr', 'mal', 'mani', 'many', 'mega', 'mes', 'meta', 'metr', 'micr', 'mid', 'mill', 'mini', 'mis',
+                'mon', 'mono', 'mult', 'myri', 'new', 'non', 'oct', 'octo', 'off', 'omni', 'on', 'othe', 'out', 'ov',
+                'over', 'pale', 'par', 'para', 'pent', 'phon', 'phot', 'phys', 'poly', 'post', 'pre', 'pret', 'prot',
+                'psyc', 'quad', 'quar', 'quin', 'radi', 're', 'robo', 'same', 'self', 'semi', 'sept', 'sex', 'span',
+                'step', 'sub', 'sui', 'supe', 'supr', 'syl', 'sym', 'syn', 'tele', 'ter', 'ther', 'thor', 'to', 'tran',
+                'tri', 'twi', 'ultr', 'un', 'unde', 'uni', 'up', 'ur', 'vice', 'wan', 'well', 'with', 'y']
 
-    SUFFIXES = ['able', 'ac', 'adeֲ', 'age', 'al', 'an', 'ain', 'ance', 'ant', 'ar', 'ard', 'ary', 'ate', 'cide',
-                'crat', 'cule', 'cy', 'dom', 'd', 'dox', 'ed', 'ee', 'eer', 'emia', 'en', 'ence', 'ency', 'ent', 'er', 'ern',
-                'es', 'ese', 'ess', 'est', 'etic', 'ette', 'ful', 'fy', 'gam', 'gamy', 'gon', 'hood', 'ial', 'ian',
-                'ic',
-                'ical', 'ied', 'ies', 'ile', 'ily', 'ine', 'ing', 'ion', 'ious', 'ish', 'ism', 'ist', 'ite', 'itis',
-                'ity', 'ive',
-                'ize', 'less', 'let', 'like', 'ling', 'log', 'ly', 'ment', 'ness', 'oid', 'oma', 'onym', 'opia', 'opsy',
-                'or', 'ory', 'osis', 'ous', 'path', 'pnea', 's', 'sect', 'ship', 'sion', 'some', 'th', 'tion', 'tome',
-                'tomy', 'tude', 'ty', 'ular', 'uous', 'ure', 'ward', 'ware', 'wise', 'y']
+    SUFFIXES = ['a', 'ac', 'ad', 'ade', 'age', 'al', 'all', 'an', 'ana', 'ane', 'ant', 'ar', 'ard', 'art', 'ary', 'ase',
+                'ate', 'b', 'bot', 'c', 'cy', 'd', 'dom', 'e', 'ean', 'ed', 'ee', 'eer', 'ein', 'eme', 'en', 'ene',
+                'ent', 'er', 'es', 'ese', 'ess', 'est', 'et', 'eth', 'ey', 'fer', 'fic', 'ful', 'fy', 'g', 'gen', 'gon',
+                'h', 'i', 'ia', 'ial', 'ian', 'ic', 'ick', 'ics', 'id', 'ide', 'ie', 'ied', 'ies', 'ify', 'ile', 'in',
+                'ine', 'ing', 'ion', 'ise', 'ish', 'ism', 'ist', 'ite', 'ity', 'ium', 'ive', 'ix', 'ize', 'kin', 'l',
+                'le', 'let', 'log', 'ly', 'm', 'mer', 'mo', 'n', "n't", 'o', 'ode', 'oid', 'ol', 'ole', 'oma', 'ome',
+                'on', 'one', 'ont', 'or', 'ory', 'ose', 'ous', 'p', 'ped', 'pod', 'q', 'r', 'ric', 'ry', 's', 'st', 't',
+                'th', 'ty', 'u', 'ught', 'ule', 'ure', 'x', 'y', 'yl', 'yne']
 
     PATH_TO_TRAINING = "data/train.wtag"
     PATH_TO_TEST_WTAG = "data/test.wtag"

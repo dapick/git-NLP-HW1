@@ -1,5 +1,5 @@
-import numpy as np
 from consts import Consts
+from parsing import Parsing
 
 
 class Aux:
@@ -17,21 +17,38 @@ class Aux:
 
     @property
     def unique_suffixes_and_prefixes(self):
-        with open("prefix.txt") as p:
-            prefixes = [line.rstrip().lower() for line in p.readlines()]
+        sentences, _ = Parsing().parse_wtag_file_to_lists("../" + Consts.PATH_TO_TRAINING)
+        words_in_train = set()
+        for sentence in sentences:
+            for word in sentence:
+                words_in_train.add(word.lower())
 
+        with open("prefix.txt") as p:
+            prefixes = {line.rstrip().lower()[:4] for line in p.readlines()}
 
         with open("suffix.txt") as s:
-            suffixes = [line.rstrip().lower() for line in s.readlines()]
+            suffixes = set()
+            for word in s.readlines():
+                if len(word) > 4:
+                    suffixes.add(word[-4].rstrip().lower())
+                else:
+                    suffixes.add(word.rstrip().lower())
 
-        print(suffixes)
-        print(prefixes)
+        prefixes_in_train = set()
+        suffixes_in_train = set()
+        for word in words_in_train:
+            for prefix in prefixes:
+                if word.startswith(prefix):
+                    prefixes_in_train.add(prefix)
+            for suffix in suffixes:
+                if word.endswith(suffix):
+                    suffixes_in_train.add(suffix)
+
+        return sorted(prefixes_in_train), sorted(suffixes_in_train)
 
 
-print(Aux().unique_tags_from_train_file)
-print(Aux().unique_suffixes_and_prefixes)
-
-
-
-
-
+if __name__ == "__main__":
+    # print(Aux().unique_tags_from_train_file)
+    prefixes_output, suffixes_output = Aux().unique_suffixes_and_prefixes
+    print("prefixes:", prefixes_output, "amount:", len(prefixes_output))
+    print("suffixes:", suffixes_output, "amount:", len(suffixes_output))
