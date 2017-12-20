@@ -46,17 +46,19 @@ class Tagger:
 
     def _tag_sentence(self, sentence_tuple: tuple):
         # Consts.TIME = 1
-        sentence_idx, sentence = sentence_tuple
         # t1 = time()
+
+        sentence_idx, sentence = sentence_tuple
         self.viterbi = Viterbi(sentence, self.model)
         tags = self.viterbi.run_viterbi()
-        # TODO: add 1 to the sentence index
-        # Consts.print_time("Tagging sentence " + str(sentence_idx), time() - t1)
+
+        # Consts.print_time("Tagging sentence " + str(sentence_idx + 1), time() - t1)
         return tags
 
     def tag(self):
         Consts.print_info("tag_file", "Tagging file " + self.word_file)
         t1 = time()
+
         # Run parallel - good when checking many sentences
         with Pool(6) as pool:
             sentences_tags = pool.map(self._tag_sentence, enumerate(self.sentences_list))
@@ -109,5 +111,5 @@ class Tagger:
                     print(x[0] + " => " + str(tup), file=f)
 
         num_words = sum(len(out_list_w[k]) for k in range(len(out_list_w)))
-        str_res = str(100 * count / num_words) + "%"
+        str_res = str(100 * (count / num_words)) + "%"
         print("The accuracy is: " + str_res)
