@@ -15,7 +15,6 @@ class Viterbi:
         self.model = model
         self.words = words
         self.n = len(self.words)
-        self.num_of_tags = len(Consts.POS_TAGS)
 
         pi = np.zeros([len(Consts.POS_TAGS)] * 2)
         pi[0, 0] = 1
@@ -30,8 +29,7 @@ class Viterbi:
         rows = []
         cols = []
         for history_idx, history in enumerate(histories):
-            tag = Consts.POS_TAGS[history.tag_idx]
-            list_idxs = self.model.feature.history_matched_features(history, tag)
+            list_idxs = self.model.feature.history_matched_features(history)
             len_list_idx = len(list_idxs)
             data += [1] * len_list_idx
             rows += [history_idx] * len_list_idx
@@ -47,11 +45,11 @@ class Viterbi:
 
         for word_idx in range(1, self.n + 1):
             # t1 = time()
-            pi_word_idx = np.zeros((self.num_of_tags, self.num_of_tags))
-            bp_word_idx = np.zeros((self.num_of_tags, self.num_of_tags), dtype='int32')
+            pi_word_idx = np.zeros((Consts.TAGS_AMOUNT, Consts.TAGS_AMOUNT))
+            bp_word_idx = np.zeros((Consts.TAGS_AMOUNT, Consts.TAGS_AMOUNT), dtype='int32')
             q = self.q(word_idx-1)
-            for u_idx in range(self.num_of_tags):
-                for v_idx in range(self.num_of_tags):
+            for u_idx in range(Consts.TAGS_AMOUNT):
+                for v_idx in range(Consts.TAGS_AMOUNT):
                     # TODO: tagging words with '*' somehow.
                     if v_idx != 0:
                         pi_word_idx[u_idx, v_idx] = np.max(np.multiply(self.pi[word_idx - 1][:, u_idx], q[:, u_idx, v_idx]))

@@ -32,6 +32,9 @@ class TaggedHistory(History):
         super().__init__(tags, sentence, current_word_idx)
         self.tag_idx = tag_idx
 
+    def get_tag_name(self):
+        return Consts.POS_TAGS[self.tag_idx]
+
 
 class Histories(object):
     # Returns a list of all possible histories and the tags given

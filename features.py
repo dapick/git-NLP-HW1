@@ -1,4 +1,4 @@
-from history import History, Histories
+from history import TaggedHistory, Histories
 from consts import Consts
 
 from time import time
@@ -19,8 +19,7 @@ class Feature(object):
 
     # Dict of {(h, t): list of features applies}
     history_tag_features = None
-    # Dict of {h: list of tags applies}
-    tags_per_history = None
+    all_possible_tagged_histories = None
 
     def __init__(self, method: str, model: str, used_features: list=None, file_full_name: str=None):
         if method == Consts.TRAIN:
@@ -32,15 +31,19 @@ class Feature(object):
         self.features_funcs = {"100": self.feature_100, "101": self.feature_101, "102": self.feature_102,
                                "103": self.feature_103, "104": self.feature_104, "105": self.feature_105,
                                "capital_letter": self.feature_capital_letter, "hyphen_word": self.feature_hyphen_word}
-        self.histories, self.tags = \
-            Histories.build_history_list_and_tags_list(file_full_name)
         self.used_features = used_features
         self.idx = 0
         self.feature_vector = {}
         self.features_occurrences = []
+        self.histories, self.tags = \
+            Histories.build_history_list_and_tags_list(file_full_name)
+        self.len_histories_in_train = len(self.histories)
 
         for feature_type in used_features:
             self.features_funcs[feature_type]()
+
+        self._calculate_all_possible_tagged_histories()
+        self.len_all_possible_tagged_histories = len(self.all_possible_tagged_histories)
 
         # Creates 'history_tag_features'
         self._calculate_history_tag_features()
@@ -52,12 +55,10 @@ class Feature(object):
             pickle.dump([self.feature_vector, self.used_features], f, protocol=-1)
 
     def _set_internal_values(self, model: str):
-        self.history_tag_features = {}
-
         with open("../data_from_training/" + model + "/internal_values_of_feature", 'rb') as f:
             self.feature_vector, self.used_features = pickle.load(f)
 
-    # Gives an index for each feature
+    # Gives an index for each feature and count how many time it was used
     def feature_structure(self, keys: tuple):
         if keys not in self.feature_vector:
             self.feature_vector[keys] = [self.idx, 1]
@@ -138,69 +139,76 @@ class Feature(object):
         self.feature_vector = survived_features
         self.features_occurrences = survived_occurrences
 
-    # Inserts the key idx to 'history_features_idxs' only if the key exist
+    # Inserts the key idx to 'history_features_idxs' only if the there is a feature identified by it
     def insert_idx(self, key: tuple, history_features_idxs: list):
         feature_value = self.feature_vector.get(key)
         if feature_value:
             history_features_idxs.append(feature_value[0])
 
-    # Calculates a list of features' idx which apply on a certain pair: (h, t)
-    def history_matched_features(self, history: History, tag: str):
+    # Calculates a list of features' idx which apply on a certain taggedHistory
+    def history_matched_features(self, history: TaggedHistory):
         history_features_idxs = []
         current_word = history.get_current_word()
+        current_tag = history.get_tag_name()
         current_word_len = len(current_word)
         # Feature_100
         if "100" in self.used_features:
-            self.insert_idx(("100", (current_word, tag)), history_features_idxs)
+            self.insert_idx(("100", (current_word, current_tag)), history_features_idxs)
         # Feature_101 + Feature_102
         if "101" in self.used_features and "102" in self.used_features:
-            self.insert_idx(("101", (history.word_custom_suffix(1), tag)), history_features_idxs)
-            self.insert_idx(("102", (history.word_custom_prefix(1), tag)), history_features_idxs)
+            self.insert_idx(("101", (history.word_custom_suffix(1), current_tag)), history_features_idxs)
+            self.insert_idx(("102", (history.word_custom_prefix(1), current_tag)), history_features_idxs)
             if current_word_len >= 2:
-                self.insert_idx(("101", (history.word_custom_suffix(2), tag)), history_features_idxs)
-                self.insert_idx(("102", (history.word_custom_prefix(2), tag)), history_features_idxs)
+                self.insert_idx(("101", (history.word_custom_suffix(2), current_tag)), history_features_idxs)
+                self.insert_idx(("102", (history.word_custom_prefix(2), current_tag)), history_features_idxs)
             if current_word_len >= 3:
-                self.insert_idx(("101", (history.word_custom_suffix(3), tag)), history_features_idxs)
-                self.insert_idx(("102", (history.word_custom_prefix(3), tag)), history_features_idxs)
+                self.insert_idx(("101", (history.word_custom_suffix(3), current_tag)), history_features_idxs)
+                self.insert_idx(("102", (history.word_custom_prefix(3), current_tag)), history_features_idxs)
             if current_word_len >= 4:
-                self.insert_idx(("101", (history.word_custom_suffix(4), tag)), history_features_idxs)
-                self.insert_idx(("102", (history.word_custom_prefix(4), tag)), history_features_idxs)
+                self.insert_idx(("101", (history.word_custom_suffix(4), current_tag)), history_features_idxs)
+                self.insert_idx(("102", (history.word_custom_prefix(4), current_tag)), history_features_idxs)
 
         # Feature 103
         if "103" in self.used_features:
-            self.insert_idx(("103", (history.tags[0], history.tags[1], tag)),
+            self.insert_idx(("103", (history.tags[0], history.tags[1], current_tag)),
                             history_features_idxs)
         # Feature 104
         if "104" in self.used_features:
-            self.insert_idx(("104", (history.tags[1], tag)), history_features_idxs)
+            self.insert_idx(("104", (history.tags[1], current_tag)), history_features_idxs)
         # Feature 105
         if "105" in self.used_features:
-            self.insert_idx(("105", tag), history_features_idxs)
+            self.insert_idx(("105", current_tag), history_features_idxs)
 
         # Feature capital_letter
         if "capital_letter" in self.used_features:
-            self.insert_idx(("capital_letter", tag), history_features_idxs)
+            self.insert_idx(("capital_letter", current_tag), history_features_idxs)
         # Feature hyphen_word
         if "hyphen_word" in self.used_features:
-            self.insert_idx(("hyphen_word", tag), history_features_idxs)
+            self.insert_idx(("hyphen_word", current_tag), history_features_idxs)
 
         return history_features_idxs
+
+    def _calculate_all_possible_tagged_histories(self):
+        Consts.TIME = 1
+        t1 = time()
+        Consts.print_info("_calculate_all_possible_tagged_histories", "Preprocessing")
+        self.all_possible_tagged_histories = []
+        for history in self.histories:
+            for tag_idx in range(Consts.TAGS_AMOUNT):
+                self.all_possible_tagged_histories.append(
+                    TaggedHistory(history.tags, history.sentence, history.current_word_idx,
+                                  tag_idx))
+        Consts.print_time("_calculate_all_possible_tagged_histories", time() - t1)
 
     def _calculate_history_tag_features(self):
         Consts.TIME = 1
         t1 = time()
         Consts.print_info("_calculate_history_tag_features", "Preprocessing")
+
         self.history_tag_features = {}
-        history_tag_list = [(history, tag) for history in self.histories for tag in Consts.POS_TAGS]
-        self.tags_per_history = {}
-        for history in self.histories:
-            self.tags_per_history[history] = []
-        for (history, tag) in history_tag_list:
-            history_features_idxs = self.history_matched_features(history, tag)
-            if history_features_idxs:
-                # Saves the (h,t) in the dict 'history_tag_features' only if they apply to some feature
-                self.history_tag_features[(history, tag)] = history_features_idxs
-                self.tags_per_history[history].append(tag)
+        for tagged_history in self.all_possible_tagged_histories:
+            self.history_tag_features[tagged_history] = self.history_matched_features(tagged_history)
+
         Consts.print_time("_calculate_history_tag_features", time() - t1)
 
     def count_features_types(self):
