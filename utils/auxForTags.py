@@ -13,7 +13,7 @@ class Aux:
                 for word in line.split():
                     _, t = word.split("_")
                     tags.add(t)
-        return tags
+        return sorted(tags)
 
     @property
     def unique_suffixes_and_prefixes(self):
@@ -48,7 +48,8 @@ class Aux:
 
 
 if __name__ == "__main__":
-    # print(Aux().unique_tags_from_train_file)
-    prefixes_output, suffixes_output = Aux().unique_suffixes_and_prefixes
-    print("prefixes:", prefixes_output, "amount:", len(prefixes_output))
-    print("suffixes:", suffixes_output, "amount:", len(suffixes_output))
+    tags = Aux().unique_tags_from_train_file
+    print("tags:", tags, "\namount:", len(tags))
+    # prefixes_output, suffixes_output = Aux().unique_suffixes_and_prefixes
+    # print("prefixes:", prefixes_output, "\namount:", len(prefixes_output))
+    # print("suffixes:", suffixes_output, "\namount:", len(suffixes_output))

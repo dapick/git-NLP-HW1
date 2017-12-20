@@ -1,7 +1,16 @@
 class Consts:
-    POS_TAGS = ['*', 'VBN', 'PRP$', 'PRP', '-LRB-', 'WP', 'PDT', 'VBP', ',', 'NNPS', 'WDT', 'NN', 'EX', '``', 'VBG',
-                'RP', 'TO', 'VBZ', 'VBD', 'JJ', 'NNP', 'FW', 'NNS', 'MD', 'CC', 'DT', '$', 'WP$', 'POS', '.', 'VB',
-                'RB', 'SYM', ':', 'CD', '-RRB-', 'JJR', 'RBS', 'WRB', '#', 'JJS', 'UH', 'RBR', "''", 'IN']
+    POS_TAGS = ['*', '#', '$', "''", ',', '-LRB-', '-RRB-', '.', ':', 'CC', 'CD', 'DT', 'EX', 'FW', 'IN', 'JJ', 'JJR', 'JJS',
+                'MD', 'NN', 'NNP', 'NNPS', 'NNS', 'PDT', 'POS', 'PRP', 'PRP$', 'RB', 'RBR', 'RBS', 'RP', 'SYM', 'TO',
+                'UH', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'WDT', 'WP', 'WP$', 'WRB', '``']
+
+    SUFFIXES = ['a', 'ac', 'ad', 'ade', 'age', 'al', 'all', 'an', 'ana', 'ane', 'ant', 'ar', 'ard', 'art', 'ary', 'ase',
+                'ate', 'b', 'bot', 'c', 'cy', 'd', 'dom', 'e', 'ean', 'ed', 'ee', 'eer', 'ein', 'eme', 'en', 'ene',
+                'ent', 'er', 'es', 'ese', 'ess', 'est', 'et', 'eth', 'ey', 'fer', 'fic', 'ful', 'fy', 'g', 'gen', 'gon',
+                'h', 'i', 'ia', 'ial', 'ian', 'ic', 'ick', 'ics', 'id', 'ide', 'ie', 'ied', 'ies', 'ify', 'ile', 'in',
+                'ine', 'ing', 'ion', 'ise', 'ish', 'ism', 'ist', 'ite', 'ity', 'ium', 'ive', 'ix', 'ize', 'kin', 'l',
+                'le', 'let', 'log', 'ly', 'm', 'mer', 'mo', 'n', "n't", 'o', 'ode', 'oid', 'ol', 'ole', 'oma', 'ome',
+                'on', 'one', 'ont', 'or', 'ory', 'ose', 'ous', 'p', 'ped', 'pod', 'q', 'r', 'ric', 'ry', 's', 'st', 't',
+                'th', 'ty', 'u', 'ught', 'ule', 'ure', 'x', 'y', 'yl', 'yne']
 
     PREFIXES = ['a', 'ab', 'abs', 'ac', 'acr', 'acro', 'acti', 'ad', 'aer', 'aero', 'af', 'afte', 'ag', 'agr', 'agri',
                 'agro', 'al', 'allo', 'ambi', 'an', 'ana', 'and', 'andr', 'angl', 'ano', 'ant', 'anth', 'anti', 'ap',
@@ -21,25 +30,16 @@ class Consts:
                 'step', 'sub', 'sui', 'supe', 'supr', 'syl', 'sym', 'syn', 'tele', 'ter', 'ther', 'thor', 'to', 'tran',
                 'tri', 'twi', 'ultr', 'un', 'unde', 'uni', 'up', 'ur', 'vice', 'wan', 'well', 'with', 'y']
 
-    SUFFIXES = ['a', 'ac', 'ad', 'ade', 'age', 'al', 'all', 'an', 'ana', 'ane', 'ant', 'ar', 'ard', 'art', 'ary', 'ase',
-                'ate', 'b', 'bot', 'c', 'cy', 'd', 'dom', 'e', 'ean', 'ed', 'ee', 'eer', 'ein', 'eme', 'en', 'ene',
-                'ent', 'er', 'es', 'ese', 'ess', 'est', 'et', 'eth', 'ey', 'fer', 'fic', 'ful', 'fy', 'g', 'gen', 'gon',
-                'h', 'i', 'ia', 'ial', 'ian', 'ic', 'ick', 'ics', 'id', 'ide', 'ie', 'ied', 'ies', 'ify', 'ile', 'in',
-                'ine', 'ing', 'ion', 'ise', 'ish', 'ism', 'ist', 'ite', 'ity', 'ium', 'ive', 'ix', 'ize', 'kin', 'l',
-                'le', 'let', 'log', 'ly', 'm', 'mer', 'mo', 'n', "n't", 'o', 'ode', 'oid', 'ol', 'ole', 'oma', 'ome',
-                'on', 'one', 'ont', 'or', 'ory', 'ose', 'ous', 'p', 'ped', 'pod', 'q', 'r', 'ric', 'ry', 's', 'st', 't',
-                'th', 'ty', 'u', 'ught', 'ule', 'ure', 'x', 'y', 'yl', 'yne']
-
     PATH_TO_TRAINING = "data/train.wtag"
     PATH_TO_TEST_WTAG = "data/test.wtag"
     PATH_TO_TEST_WORDS = "data/test.words"
     PATH_TO_COMPETITION = "data/comp.words"
 
     TRAIN = "Train"
+    TAG = "Tag"
+
     BASIC_MODEL = "basic_model"
     ADVANCED_MODEL = "advanced_model"
-
-    TAG = "Tag"
 
     DEBUG = 0
     TIME = 0
