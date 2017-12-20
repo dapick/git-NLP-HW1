@@ -97,10 +97,14 @@ class Tagger:
             for key, value in sorted(confused_tags.items(), key=lambda x: x[0]):
                 print(key + " => " + str(value["dict"]) + "\n" + key + " => " + str(value["sum_wrong"]), file=f)
 
-        list_max_wrong_tags = sorted(confused_tags.items(), key=lambda x: x[1]["sum_wrong"], reverse=True)[:10]
+        list_max_wrong_tags = sorted(sorted(confused_tags.items(), key=lambda x: x[1]["sum_wrong"], reverse=True)[:10],
+                                     key=lambda x: x[0])
         with open("../data_from_training/" + self.model_type + "/10_worst_tags", "w+") as f:
-            for x in sorted(list_max_wrong_tags, key=lambda x: x[0]):
+            for x in list_max_wrong_tags:
                 print(x[0] + " => " + str(sorted(x[1]["dict"].items(), key=lambda x: x[0])) + "\n" + x[0] + " => " + str(x[1]["sum_wrong"]), file=f)
+
+        with open("../data_from_training/" + self.model_type + "/10_worst_tags_with_wrong_sentences", "w+") as f:
+            for x in list_max_wrong_tags:
                 for tup in confused_tags_with_sen[x[0]]:
                     print(x[0] + " => " + str(tup), file=f)
 
