@@ -57,3 +57,23 @@ class Histories(object):
                             History(["*", sentence_tags[idx-1]], sentence, idx))
                 histories_tags.append(tag)
         return histories, histories_tags
+
+    # Returns a list of all possible histories and the tags given
+    @staticmethod
+    def build_tagged_histories_list(file_full_name: str) -> list:
+        sentences, tags = Parsing.parse_wtag_file_to_lists(file_full_name)
+        tagged_histories = []
+        for sentence, sentence_tags in zip(sentences, tags):
+            for idx_in_sentence, tag in enumerate(sentence_tags):
+                tag_idx = Consts.DICT_POS_TAGS[tag]
+                if idx_in_sentence > 1:
+                    tagged_histories.append(
+                        TaggedHistory([sentence_tags[idx_in_sentence-2], sentence_tags[idx_in_sentence-1]], sentence, idx_in_sentence, tag_idx))
+                else:
+                    if idx_in_sentence == 0:
+                        tagged_histories.append(
+                            TaggedHistory(["*", "*"], sentence, idx_in_sentence, tag_idx))
+                    elif idx_in_sentence == 1:
+                        tagged_histories.append(
+                            TaggedHistory(["*", sentence_tags[idx_in_sentence-1]], sentence, idx_in_sentence, tag_idx))
+        return tagged_histories

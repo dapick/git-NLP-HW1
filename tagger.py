@@ -45,14 +45,14 @@ class Tagger:
         return ret_file
 
     def _tag_sentence(self, sentence_tuple: tuple):
-        # Consts.TIME = 1
-        # t1 = time()
+        Consts.TIME = 1
+        t1 = time()
 
         sentence_idx, sentence = sentence_tuple
         self.viterbi = Viterbi(sentence, self.model)
         tags = self.viterbi.run_viterbi()
 
-        # Consts.print_time("Tagging sentence " + str(sentence_idx + 1), time() - t1)
+        Consts.print_time("Tagging sentence " + str(sentence_idx + 1), time() - t1)
         return tags
 
     def tag(self):
