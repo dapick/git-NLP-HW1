@@ -12,7 +12,7 @@ class Training(object):
     features_occurrences_ndarray = None
 
     v_parameter = None
-    # lambda_value = None
+    lambda_value = None
 
     # Common values between iterations
     right_sum_for_L = None

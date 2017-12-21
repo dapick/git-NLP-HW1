@@ -48,8 +48,8 @@ class AdvancedModel(Model):
     def _training(self, file_full_name: str):
         # TODO: should run with several lambda values
         self.v_parameter = Training(Consts.ADVANCED_MODEL,
-                                    ["100", "101", "102", "103", "104", "105", "capital_letter", "hyphen_word"],
-                                    lambda_value=0.1, file_full_name=file_full_name).v_parameter
+                                    ["100", "101", "102", "103", "104", "105"],
+                                    lambda_value=0.5, file_full_name=file_full_name).v_parameter
         with open("../data_from_training/" + Consts.ADVANCED_MODEL + "/v_parameter", 'wb') as f:
             pickle.dump(self.v_parameter, f, protocol=-1)
 
