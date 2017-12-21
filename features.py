@@ -18,10 +18,13 @@ class Feature(object):
     # List of: in place 'feature_idx' there is the occurrence_number
     features_occurrences = None
 
-    # Dict of {(h, t): list of features applies}
-    history_tag_features = None
     all_possible_tagged_histories = None
-    features_matrix = None
+    all_possible_histories_features = None
+    features_matrix_all_possible_histories = None
+
+    tagged_histories = None
+    tagged_histories_features = None
+    features_matrix_tagged_histories = None
 
     def __init__(self, method: str, model: str, used_features: list=None, file_full_name: str=None):
         if method == Consts.TRAIN:
@@ -37,19 +40,24 @@ class Feature(object):
         self.idx = 0
         self.feature_vector = {}
         self.features_occurrences = []
+
         self.histories, self.tags = \
             Histories.build_history_list_and_tags_list(file_full_name)
-        self.len_histories_in_train = len(self.histories)
 
         for feature_type in used_features:
             self.features_funcs[feature_type]()
 
         self.features_amount = len(self.features_occurrences)
+
+        self.tagged_histories = Histories.build_tagged_histories_list(file_full_name)
+        self.len_tagged_histories = len(self.tagged_histories)
+        self._calculate_tagged_histories_features()
+        self._calculate_features_matrix_tagged_histories()
+
         self._calculate_all_possible_tagged_histories()
         self.len_all_possible_tagged_histories = len(self.all_possible_tagged_histories)
-
-        self._calculate_history_tag_features()
-        self._calculate_features_matrix()
+        self._calculate_all_possible_histories_features()
+        self._calculate_features_matrix_all_possible_histories()
 
         with open('../data_from_training/' + model + '/feature_vector', 'w+') as f:
             for key, values in self.feature_vector.items():
@@ -203,34 +211,63 @@ class Feature(object):
                                   tag_idx))
         Consts.print_time("_calculate_all_possible_tagged_histories", time() - t1)
 
-    def _calculate_features_matrix(self):
+    def _calculate_features_matrix_all_possible_histories(self):
         Consts.TIME = 1
         t1 = time()
-        Consts.print_info("_calculate_features_matrix", "Preprocessing")
+        Consts.print_info("_calculate_features_matrix_all_possible_histories", "Preprocessing")
         data = []
         rows = []
         cols = []
         for history_idx, tagged_history in enumerate(self.all_possible_tagged_histories):
-            list_idxs = self.history_tag_features[tagged_history]
+            list_idxs = self.all_possible_histories_features[tagged_history]
             len_list_idx = len(list_idxs)
             data += [1] * len_list_idx
             rows += [history_idx] * len_list_idx
             cols += list_idxs
 
-        self.features_matrix = coo_matrix((data, (rows, cols)),
-                                          shape=(self.len_all_possible_tagged_histories, self.features_amount)).tocsr()
-        Consts.print_time("_calculate_features_matrix", time() - t1)
+        self.features_matrix_all_possible_histories = coo_matrix((data, (rows, cols)),
+                                                                 shape=(self.len_all_possible_tagged_histories, self.features_amount)).tocsr()
+        Consts.print_time("_calculate_features_matrix_all_possible_histories", time() - t1)
 
-    def _calculate_history_tag_features(self):
+    def _calculate_features_matrix_tagged_histories(self):
         Consts.TIME = 1
         t1 = time()
-        Consts.print_info("_calculate_history_tag_features", "Preprocessing")
+        Consts.print_info("_calculate_features_matrix_tagged_histories", "Preprocessing")
+        data = []
+        rows = []
+        cols = []
+        for history_idx, tagged_history in enumerate(self.tagged_histories):
+            list_idxs = self.tagged_histories_features[tagged_history]
+            len_list_idx = len(list_idxs)
+            data += [1] * len_list_idx
+            rows += [history_idx] * len_list_idx
+            cols += list_idxs
 
-        self.history_tag_features = {}
+        self.features_matrix_tagged_histories = coo_matrix((data, (rows, cols)),
+                                                                 shape=(self.len_tagged_histories, self.features_amount)).tocsr()
+        Consts.print_time("_calculate_features_matrix_tagged_histories", time() - t1)
+
+    def _calculate_all_possible_histories_features(self):
+        Consts.TIME = 1
+        t1 = time()
+        Consts.print_info("_calculate_all_possible_histories_features", "Preprocessing")
+
+        self.all_possible_histories_features = {}
         for tagged_history in self.all_possible_tagged_histories:
-            self.history_tag_features[tagged_history] = self.history_matched_features(tagged_history)
+            self.all_possible_histories_features[tagged_history] = self.history_matched_features(tagged_history)
 
-        Consts.print_time("_calculate_history_tag_features", time() - t1)
+        Consts.print_time("_calculate_all_possible_histories_features", time() - t1)
+
+    def _calculate_tagged_histories_features(self):
+        Consts.TIME = 1
+        t1 = time()
+        Consts.print_info("_calculate_tagged_histories_features", "Preprocessing")
+
+        self.tagged_histories_features = {}
+        for tagged_history in self.tagged_histories:
+            self.tagged_histories_features[tagged_history] = self.history_matched_features(tagged_history)
+
+        Consts.print_time("_calculate_tagged_histories_features", time() - t1)
 
     def count_features_types(self):
         for feature_type in self.used_features:

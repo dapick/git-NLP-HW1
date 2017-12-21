@@ -2,6 +2,7 @@ from consts import Consts
 from features import Feature
 
 from scipy.optimize import minimize
+from scipy.special import logsumexp
 import numpy as np
 from time import time
 
@@ -11,17 +12,16 @@ class Training(object):
     features_occurrences_ndarray = None
 
     v_parameter = None
-    # TODO: find which lambda should we use
-    lambda_value = None
+    # lambda_value = None
 
     # Common values between iterations
     right_sum_for_L = None
     product_for_gradient = None
 
-    def __init__(self, model: str, used_features: list, lambda_value: float, file_full_name: str=Consts.PATH_TO_TRAINING):
+    def __init__(self, model: str, used_features: list, lambda_value: float, file_full_name: str):
         self.feature = Feature(Consts.TRAIN, model, used_features, file_full_name)
         self.features_occurrences_ndarray = np.asarray(self.feature.features_occurrences)
-        self.lambda_value = np.array(lambda_value)
+        self.lambda_value = np.array([lambda_value])
 
         self.iterate_number = 0
         self.time_started_LBFGS = 0
@@ -38,31 +38,31 @@ class Training(object):
         return optimize_result.x
 
     def _calculate_matrices(self, v_parameter):
-        numerator_for_gradient = np.exp(self.feature.features_matrix.dot(v_parameter)).reshape(
-            (self.feature.len_histories_in_train, Consts.TAGS_AMOUNT))
-        inner_sum = np.sum(numerator_for_gradient, axis=-1).reshape((self.feature.len_histories_in_train, 1))
-        self.right_sum_for_L = np.sum(np.log(inner_sum))
+        v_sum = (self.feature.features_matrix_all_possible_histories.dot(v_parameter)).reshape(
+            (self.feature.len_tagged_histories, Consts.TAGS_AMOUNT))
+        logsumexp_v = logsumexp(v_sum, axis=-1, keepdims=True)
+        self.right_sum_for_L = np.sum(logsumexp_v)
 
-        product = (numerator_for_gradient / inner_sum).reshape(
-            (self.feature.len_all_possible_tagged_histories, 1))
-        self.product_for_gradient = np.sum(self.feature.features_matrix.multiply(product), axis=0)
+        product = np.exp(v_sum - logsumexp_v).reshape((self.feature.len_all_possible_tagged_histories, 1))
+        self.product_for_gradient = np.sum(self.feature.features_matrix_all_possible_histories.multiply(product), axis=0)
 
     def _v_squares(self, v_parameter):
         # Consts.print_debug("_v_squares", "Calculating")
-        return sum(np.square(v_parameter))
+        return np.sum(np.square(v_parameter))
 
     def _L(self, v_parameter):
         # Consts.print_info("_L", "Calculating")
         self.time_started_LBFGS = time()
         self._calculate_matrices(v_parameter)
 
-        left_sum = sum(v_parameter * self.features_occurrences_ndarray)
+        left_sum = np.sum(self.feature.features_matrix_tagged_histories.dot(v_parameter))
         right_sum = self.right_sum_for_L
 
-        return -(left_sum - right_sum - ((self.lambda_value/2) * self._v_squares(v_parameter)))
+        return -(left_sum - right_sum - (self._v_squares(v_parameter) * (self.lambda_value / 2)))
 
     def _gradient(self, v_parameter):
-        gradient = self.features_occurrences_ndarray - self.product_for_gradient - (self.lambda_value * v_parameter)
+        gradient = self.features_occurrences_ndarray - np.squeeze(np.asarray(self.product_for_gradient)) - \
+                   np.multiply(v_parameter, self.lambda_value)
 
         Consts.TIME = 1
         Consts.print_time("Iterate number " + str(self.iterate_number), time() - self.time_started_LBFGS)
