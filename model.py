@@ -46,7 +46,6 @@ class AdvancedModel(Model):
         super().__init__(method, file_full_name)
 
     def _training(self, file_full_name: str):
-        # TODO: should run with several lambda values
         self.v_parameter = Training(Consts.ADVANCED_MODEL,
                                     ["100", "101", "102", "103", "104", "105"],
                                     lambda_value=0.5, file_full_name=file_full_name).v_parameter

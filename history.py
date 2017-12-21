@@ -58,7 +58,7 @@ class Histories(object):
                 histories_tags.append(tag)
         return histories, histories_tags
 
-    # Returns a list of all possible histories and the tags given
+    # Returns a list of all tagged histories
     @staticmethod
     def build_tagged_histories_list(file_full_name: str) -> list:
         sentences, tags = Parsing.parse_wtag_file_to_lists(file_full_name)

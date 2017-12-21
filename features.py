@@ -34,8 +34,7 @@ class Feature(object):
 
     def _training(self, model: str, used_features: list, file_full_name: str=Consts.PATH_TO_TRAINING):
         self.features_funcs = {"100": self.feature_100, "101": self.feature_101, "102": self.feature_102,
-                               "103": self.feature_103, "104": self.feature_104, "105": self.feature_105,
-                               "capital_letter": self.feature_capital_letter, "hyphen_word": self.feature_hyphen_word}
+                               "103": self.feature_103, "104": self.feature_104, "105": self.feature_105}
         self.used_features = used_features
         self.idx = 0
         self.feature_vector = {}
@@ -125,32 +124,7 @@ class Feature(object):
         for tag in self.tags:
             self.feature_structure(("105", tag))
 
-    def feature_capital_letter(self):
-        Consts.print_info("feature_capital_letter", "Building")
-        for history, tag in zip(self.histories, self.tags):
-            if history.get_current_word()[0].isupper():
-                self.feature_structure(("capital_letter", tag))
-
-    def feature_hyphen_word(self):
-        Consts.print_info("feature_hyphen_word", "Building")
-        for history, tag in zip(self.histories, self.tags):
-            if '-' in history.get_current_word():
-                self.feature_structure(("hyphen_word", tag))
-
-    def _reduce_features(self):
-        Consts.print_info("_reduce_features", "Reducing")
-        self.idx = 0
-        survived_features = {}
-        survived_occurrences = []
-        for feature_key, feature_value in self.feature_vector.items():
-            if feature_value[1] > 5:
-                survived_features[feature_key] = (self.idx, feature_value[1])
-                survived_occurrences.append(feature_value[1])
-                self.idx += 1
-        self.feature_vector = survived_features
-        self.features_occurrences = survived_occurrences
-
-    # Inserts the key idx to 'history_features_idxs' only if the there is a feature identified by it
+    # Inserts the key idx to 'history_features_idxs' only if there is a feature identified by it
     def insert_idx(self, key: tuple, history_features_idxs: list):
         feature_value = self.feature_vector.get(key)
         if feature_value:
@@ -190,31 +164,27 @@ class Feature(object):
         if "105" in self.used_features:
             self.insert_idx(("105", current_tag), history_features_idxs)
 
-        # Feature capital_letter
-        if "capital_letter" in self.used_features:
-            self.insert_idx(("capital_letter", current_tag), history_features_idxs)
-        # Feature hyphen_word
-        if "hyphen_word" in self.used_features:
-            self.insert_idx(("hyphen_word", current_tag), history_features_idxs)
-
         return history_features_idxs
 
     def _calculate_all_possible_tagged_histories(self):
         Consts.TIME = 1
         t1 = time()
         Consts.print_info("_calculate_all_possible_tagged_histories", "Preprocessing")
+
         self.all_possible_tagged_histories = []
         for history in self.histories:
             for tag_idx in range(Consts.TAGS_AMOUNT):
                 self.all_possible_tagged_histories.append(
                     TaggedHistory(history.tags, history.sentence, history.current_word_idx,
                                   tag_idx))
+
         Consts.print_time("_calculate_all_possible_tagged_histories", time() - t1)
 
     def _calculate_features_matrix_all_possible_histories(self):
         Consts.TIME = 1
         t1 = time()
         Consts.print_info("_calculate_features_matrix_all_possible_histories", "Preprocessing")
+
         data = []
         rows = []
         cols = []
@@ -227,12 +197,14 @@ class Feature(object):
 
         self.features_matrix_all_possible_histories = coo_matrix((data, (rows, cols)),
                                                                  shape=(self.len_all_possible_tagged_histories, self.features_amount)).tocsr()
+
         Consts.print_time("_calculate_features_matrix_all_possible_histories", time() - t1)
 
     def _calculate_features_matrix_tagged_histories(self):
         Consts.TIME = 1
         t1 = time()
         Consts.print_info("_calculate_features_matrix_tagged_histories", "Preprocessing")
+
         data = []
         rows = []
         cols = []
@@ -245,6 +217,7 @@ class Feature(object):
 
         self.features_matrix_tagged_histories = coo_matrix((data, (rows, cols)),
                                                                  shape=(self.len_tagged_histories, self.features_amount)).tocsr()
+
         Consts.print_time("_calculate_features_matrix_tagged_histories", time() - t1)
 
     def _calculate_all_possible_histories_features(self):

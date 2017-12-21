@@ -50,7 +50,6 @@ class Viterbi:
             q = self.q(word_idx-1)
             for u_idx in range(Consts.TAGS_AMOUNT):
                 for v_idx in range(Consts.TAGS_AMOUNT):
-                    # TODO: tagging words with '*' somehow.
                     if v_idx != 0:
                         pi_word_idx[u_idx, v_idx] = np.max(np.multiply(self.pi[word_idx - 1][:, u_idx], q[:, u_idx, v_idx]))
                         bp_word_idx[u_idx, v_idx] = np.argmax(np.multiply(self.pi[word_idx - 1][:, u_idx], q[:, u_idx, v_idx]))
