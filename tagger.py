@@ -60,7 +60,7 @@ class Tagger:
         t1 = time()
 
         # Run parallel - good when checking many sentences
-        with Pool(6) as pool:
+        with Pool(3) as pool:
             sentences_tags = pool.map(self._tag_sentence, enumerate(self.sentences_list))
 
         # Run linear - good when checking a few sentences
