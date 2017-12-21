@@ -56,7 +56,7 @@ class Tagger:
         return tags
 
     def tag(self):
-        Consts.print_info("tag_file", "Tagging file " + self.word_file)
+        Consts.print_info("tag_file", "Tagging file '" + self.word_file + "' by '" + self.model_type + "'")
         Consts.TIME = 1
         t1 = time()
 
